@@ -12,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import Area.Area;
+import Area.DB_Area;
 import Movie.DB_MovieArea;
 import Movie.DB_MovieInfo;
 import Movie.Movie;
@@ -49,7 +51,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 
 	//지역
 	private JLabel jlarea = new JLabel("지역");
-	private JButton btn_seoul = new JButton("서울");
+	private JButton btn_seoul = new JButton();
 	private JButton btn_gyeonggi = new JButton("경기");
 	private JButton[] btn_seoullist = new JButton[4];
 	private JButton[] btn_gyeonggilist = new JButton[4];
@@ -62,11 +64,15 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	//DB
 	private DB_MovieInfo movie_connect = new DB_MovieInfo();
 	private DB_MovieArea moviearea_connect = new DB_MovieArea();
-	private DB_Theater theat_connect = new DB_Theater();
+	private DB_Theater theater_connect = new DB_Theater();
+	private DB_Area area_connect = new DB_Area();
+	
 	//
-	private Movie movie[];
-	private MovieArea movieArea[];
-	private Theater theater[];
+	private Movie[] movie;
+	private MovieArea[] movieArea;
+	private Theater[] theater;
+	private Area[] area;
+	private int movie_key;
 	
 	//count
 	private int movie_count = 0; 
@@ -88,6 +94,8 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		setVisible(true);
 		setBackground(Color.WHITE);
 		
+		area = area_connect.getArea();
+		theater = theater_connect.getTheater();
 		this.user = user;
 		
 		
@@ -152,13 +160,16 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		jlarea.setHorizontalAlignment(JLabel.CENTER);
 		a_panel.add(jlarea);
 		
+		//서울
+		btn_seoul.setText(area[3].getArea());
 		btn_seoul.setBounds(0, 75, 225, 40);
 		btn_seoul.setOpaque(true);
 		btn_seoul.setFont(font2);
 		btn_seoul.setHorizontalAlignment(JButton.CENTER);
 		btn_seoul.addActionListener(new ReservationEvent());
 		a_panel.add(btn_seoul);
-		
+		//경기
+		btn_gyeonggi.setText(area[0].getArea());
 		btn_gyeonggi.setBounds(225, 75, 225, 40);
 		btn_gyeonggi.setFont(font2);
 		btn_gyeonggi.setHorizontalAlignment(JButton.CENTER);
@@ -257,7 +268,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		//영화 버튼
 		if(movie_count<3) {
 			JMovieButton m = (JMovieButton) e.getSource();
-			int movie_key = m.getMovieKey();//영화 프라이머리_key가져오기
+			movie_key = m.getMovieKey();//영화 프라이머리_key가져오기
 			System.out.println(movie_key);
 			//movieArea = moviearea_connect.getMovieArea(movie_key);//키에 따른 정보 가져오기
 			//jlposter[count].setText(m.getText());

@@ -38,11 +38,6 @@ public class CategoryFrame extends JFrame {
 	
 	 //user¡§∫∏
 	 protected User user = new User();
-	 
-	 ImageIcon iconH = new ImageIcon("src/imges/HOME.png");
-	 Image imageH = iconH.getImage();
-	 Image change_imgH = imageH.getScaledInstance(250, 50, java.awt.Image.SCALE_SMOOTH);
-	 ImageIcon imgH = new ImageIcon(change_imgH);
 	
 	public CategoryFrame() {
 		

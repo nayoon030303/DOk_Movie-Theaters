@@ -27,21 +27,28 @@ public class MyPage extends CategoryFrame{
 	//component
 	
 	private JPanel panel = new JPanel();
-	private JLabel profile_img = new JLabel("사진");
+	private JLabel profile_img = new JLabel();
 	private JLabel name = new JLabel();
 	private JLabel id = new JLabel("아이디");
 	private JLabel birthday = new JLabel("생년월일");
 	private JLabel phone = new JLabel("전화번호");
 	private JLabel taste = new JLabel("영화 취향");
-	private JButton btn_modify_Info = new JButton("개인정보 수정");
-	private JButton btn_modify_Profile = new JButton("프로필 수정");
+	private JButton btn_modify_Info = new JButton();
+	private JButton btn_modify_Profile = new JButton();
 	private JLabel userInfo = new JLabel("개인 정보");
-	private JLabel record_movie = new JLabel("최근 예매한 영화");
+	private JLabel record_movie = new JLabel();
 	private JLabel record_movieInfo = new JLabel();
+	
 	
 	//Design
 	Font font1 = new Font("휴먼둥근헤드라인", Font.PLAIN, 25);
 	Font font2 = new Font("휴먼둥근헤드라인", Font.PLAIN, 15);
+	
+	ImageIcon imgInfo = new ImageIcon("src/imges/info.png");
+	ImageIcon imgRecord = new ImageIcon("src/imges/record.png");
+	ImageIcon imgReInfo = new ImageIcon("src/imges/re_info.png");
+	ImageIcon imgReProfile = new ImageIcon("src/imges/re_profile.png");
+	ImageIcon imgOctopus = new ImageIcon("src/imges/P_octopus.png");
 	
 	
 	
@@ -59,9 +66,9 @@ public class MyPage extends CategoryFrame{
 		
 		//프로필 사진
 		profile_img.setBounds(POS_X_LEFT, PaddingTop, 400, 400);
-		profile_img.setOpaque(true);
+		profile_img.setOpaque(false);
 		profile_img.setBackground(Color.RED);
-		profile_img.setFont(font1);
+		profile_img.setIcon(imgOctopus);
 		panel.add(profile_img);
 		
 		//사용자 이름
@@ -73,17 +80,15 @@ public class MyPage extends CategoryFrame{
 		
 		//프로필 수정btn
 		btn_modify_Profile.setBounds(POS_X_LEFT + 100,PaddingTop + 525,200,50);
-		btn_modify_Profile.setOpaque(true);
-		btn_modify_Profile.setBackground(Color.GRAY);
-		btn_modify_Profile.setFont(font1);
+		btn_modify_Profile.setIcon(imgReProfile);
+		btn_modify_Profile.setBorderPainted(false);
 		btn_modify_Profile.addActionListener(new BtnEvent());
 		panel.add(btn_modify_Profile);
 		
 		//개인 정보
-		userInfo.setBounds(POS_X_CENTER - 50,PaddingTop,300,50);
-		userInfo.setOpaque(true);
-		userInfo.setBackground(Color.YELLOW);
-		userInfo.setFont(font1);
+		userInfo.setBounds(POS_X_CENTER - 50,PaddingTop,150,50);
+		userInfo.setOpaque(false);
+		userInfo.setIcon(imgInfo);
 		panel.add(userInfo);
 		
 		//아이디
@@ -120,26 +125,22 @@ public class MyPage extends CategoryFrame{
 		
 		//개인정보수정btn
 		btn_modify_Info.setBounds(POS_X_CENTER + 400, PaddingTop, 200, 50);
-		btn_modify_Info.setOpaque(true);
-		btn_modify_Info.setBackground(Color.GRAY);
-		btn_modify_Info.setFont(font1);
+		btn_modify_Info.setIcon(imgReInfo);
+		btn_modify_Info.setBorderPainted(false);
 		btn_modify_Info.addActionListener(new BtnEvent());
 		panel.add(btn_modify_Info);
 		
 	
 		
 		//최근 예매한 영화 label
-		record_movie.setBounds(POS_X_CENTER - 50, PaddingTop + 300, 300, 50);
-		record_movie.setOpaque(true);
-		record_movie.setBackground(Color.YELLOW);
-		record_movie.setFont(font1);
+		record_movie.setBounds(POS_X_CENTER - 50, PaddingTop + 300, 250, 50);
+		record_movie.setOpaque(false);
+		record_movie.setIcon(imgRecord);
 		panel.add(record_movie);
 		
 		//최근 예매한 영화
 		record_movieInfo.setBounds(POS_X_CENTER - 50, PaddingTop + 365, 650, 250);
-		record_movieInfo.setOpaque(true);
 		record_movieInfo.setFont(font2);
-		record_movieInfo.setBackground(Color.CYAN);
 		panel.add(record_movieInfo);
 		
 		

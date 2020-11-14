@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -31,10 +32,12 @@ public class MovieSitPage extends CategoryFrame {
 	JComboBox combobox_teen = new JComboBox(number);
 	JLabel kids = new JLabel("아이");
 	JComboBox combobox_kids = new JComboBox(number);
-	JButton next = new JButton("다음");
+	JButton next = new JButton();
 	
 	JLabel[] row = new JLabel[24];
 	JLabel[] column = new JLabel[9];
+	
+	private ImageIcon imgNext = new ImageIcon("src/imges/next.png");
 	
 	int num_adult = 0;
 	int num_teen = 0;
@@ -147,9 +150,8 @@ public class MovieSitPage extends CategoryFrame {
 		panel.add(combobox_kids);
 		
 		next.setBounds(PaddingLeft + 1100, PaddingTop + 525, 150, 50);
-		next.setBackground(Color.PINK);
-		next.setFont(people);
-		next.setHorizontalAlignment(JButton.CENTER);
+		next.setIcon(imgNext);
+		next.setBorderPainted(false);
 		next.addActionListener(new BtnEvent());
 		panel.add(next);
 

@@ -66,6 +66,7 @@ public class DB_Theater {
 		return areas;
 		
 	}
+	
 	public int countTheater() {
 		int n = 0;
 		try {
