@@ -12,8 +12,14 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -44,8 +50,8 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	private final static double Panel_Height = 700;
 
 	// 날짜
-	private Calendar cal = Calendar.getInstance();
-
+	private LocalDateTime currentDateTime = LocalDateTime.now();//현재 날짜와 시간
+	
 	// size
 	private Dimension size = new Dimension();// 사이즈를 지정하기 위한 객체 생성
 
@@ -97,20 +103,17 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	private int checkMonth;
 	private int checkDay;
 	private int checkDayofweek;
-	private int year;
-	private int month;
-	private int day;
-	private int dayofweek;
-	private int endDate;
 	private boolean isCheckButton = false;
 	private boolean isNoSchedule = false;
 	private boolean isReset = false;
 	private String str = null;
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd HH:mm");
+	 
 
-	Color purple = new Color(82, 12, 139);
+	private HashMap<String, Integer> mapDayOfweeks = new HashMap<String, Integer>();
+	
+	private Color purple = new Color(82, 12, 139);
 
-	String weeksName = "";
+	private String weeksName = "";
 
 	// count
 	private int movieCount = 0;
@@ -145,14 +148,17 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		getContentPane().setLayout(null); // 레이아웃 null
 		setVisible(true);
 		setBackground(Color.WHITE);
+		
+		
+		mapDayOfweeks.put("월", 1);
+		mapDayOfweeks.put("화", 2);
+		mapDayOfweeks.put("수", 3);
+		mapDayOfweeks.put("목", 4);
+		mapDayOfweeks.put("금", 5);
+		mapDayOfweeks.put("토", 6);
+		mapDayOfweeks.put("일", 7);
 
-		// 날짜
-		year = cal.get(Calendar.YEAR);
-		month = cal.get(Calendar.MONTH); // 월
-		day = cal.get(Calendar.DATE);// 날짜
-		dayofweek = cal.get(Calendar.DAY_OF_WEEK);// 요일
-		endDate = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-
+		
 		areaKey = "서울";
 
 		// 데어터 연결
@@ -308,9 +314,18 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		// 날짜
 		for (int i = 0; i < dayAndDayofTable.length; i++) {
 
-			weeksName = getDayOfweek(dayofweek);
-
-			dayAndDayofTable[i] = new JKeyButton(day + "*" + weeksName);
+			LocalDateTime newDate = currentDateTime.plusDays(i);
+			//LocalDateTime targetDateTime = newDate.with(TemporalAdjusters.lastDayOfMonth());//이달의 마지막
+			
+			int year = newDate.getYear();
+			int month = newDate.getMonthValue();
+			int day = newDate.getDayOfMonth();
+			String dayofweek = newDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
+			//int endDate = targetDateTime.getDayOfMonth();//이달의 마지막
+			
+			
+			// 날짜			
+			dayAndDayofTable[i] = new JKeyButton(day + "*" + dayofweek);
 			dayAndDayofTable[i].setYear(year);
 			dayAndDayofTable[i].setMonth(month);
 			dayAndDayofTable[i].setDay(day);
@@ -323,19 +338,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 			dayAndDayofTable[i].addActionListener(new Movie_day_Event());
 			dayAndDayofTable[i].addMouseListener(new EventAdaptor());
 			timePanel.add(dayAndDayofTable[i]);
-			dayofweek += 1;
-			day += 1;
-			if (day > endDate) {
-				day = 1;
-				month += 1;
-				if (month > 11) {
-					month = 0;
-					year += 1;
-				}
-			}
-			if (dayofweek >= 8) {
-				dayofweek = 1;
-			}
+	
 		}
 		// -------------------
 
@@ -429,7 +432,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					checkYear = dayAndDayofTable[i].getYear();
 					checkMonth = dayAndDayofTable[i].getMonth();
 					checkDay = dayAndDayofTable[i].getDay();
-					checkDayofweek = dayAndDayofTable[i].getDayofweek();
+					checkDayofweek = mapDayOfweeks.get(dayAndDayofTable[i].getDayofweek());
 				}
 			}
 			
@@ -513,7 +516,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		JKeyButton m = (JKeyButton) e.getSource();
 		movieName = m.getText();
 		movieKey = m.getMovieKey();// 영화 프라이머리_key가져오기
-
+		System.out.println(movieKey);
 		for (int i = 0; i < movieNum; i++) {
 			btn_movie[i].setBackground(Color.WHITE);
 			btn_movie[i].setForeground(Color.BLACK);
@@ -532,7 +535,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					yearMonthTable[i].setVisible(true);
 					int year = dayAndDayofTable[i].getYear();
 					int month = dayAndDayofTable[i].getMonth();
-					yearMonthTable[i].setText(year + "년  " + (month + 1) + "월");
+					yearMonthTable[i].setText(year + "년  " + month  + "월");
 				}
 			}
 		}
@@ -552,55 +555,35 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	public void run() {
 	
 		while (true) {// 무한반복
-			Date currentDate = new Date();//영화 시간비교,			 
-			
+			LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
+
 			try {
 				
-				if (currentDate.getHours() == 23 && currentDate.getMinutes() == 59 && currentDate.getSeconds() == 59) {	//11시59분 59초
-					Calendar cal = Calendar.getInstance();// 현재 날짜		
-										
-					int year = cal.get(Calendar.YEAR);
-					int month = cal.get(Calendar.MONTH); // 월
-					int day = cal.get(Calendar.DATE);// 날짜
-					int dayofweek = cal.get(Calendar.DAY_OF_WEEK);// 요일
-					int endDate = cal.getActualMaximum(Calendar.DAY_OF_MONTH);// 이달의 마지막 날짜
-					System.out.println(year+","+(month+1)+","+day+","+dayofweek);
+				// 11시59분 59초 일떄
+				if (currentDateTime.getHour() == 23 && currentDateTime.getMinute() == 59 && currentDateTime.getSecond() == 59) { 
+					LocalDateTime newDate = currentDateTime.plusDays(1);					
+					int year = currentDateTime.getYear();//년도
+					int month = currentDateTime.getMonthValue(); // 월
+					int day = currentDateTime.getDayOfMonth();// 날짜
+					String dayofweek = currentDateTime.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);// 요일
+					//int endDate = cal.getActualMaximum(Calendar.DAY_OF_MONTH);// 이달의 마지막 날짜
+					System.out.println(year + "," + (month + 1) + "," + day + "," + dayofweek);
 					for (int i = 0; i < dayAndDayofTable.length; i++) {
-
-						weeksName = getDayOfweek(dayofweek);
-
-						dayAndDayofTable[i].setText(day + "**" + weeksName);
+					
+						dayAndDayofTable[i].setText(day + "**" + dayofweek);
 						dayAndDayofTable[i].setYear(year);
 						dayAndDayofTable[i].setMonth(month);
 						dayAndDayofTable[i].setDay(day);
 						dayAndDayofTable[i].setDayofweek(dayofweek);
 						timePanel.add(dayAndDayofTable[i]);
-						dayofweek += 1;
-						day += 1;
-						if (day > endDate) {
-							day = 1;
-							month += 1;
-							if (month > 11) {
-								month = 0;
-								year += 1;
-							}
-						}
-						if (dayofweek >= 8) {
-							dayofweek = 1;
-						}
-						
-					}
-					//isReset = true;
-					checkDayofweek+=1;
-					if(checkDayofweek>=8) {
-						checkDayofweek =0; 
-					}
+
+					}										
 					reset();
 				}
-				
+
 				// System.out.println(currentDate);
 				IsnoScheduleVisible();
-				movieAreaContent(currentDate);
+				movieAreaContent(currentDateTime);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -619,12 +602,13 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		}
 	}
 
-	public void movieAreaContent(Date currentDate) throws ParseException {
-		if (isReset) {// 초기화 되었을떄만 그리기
-			
+	public void movieAreaContent(LocalDateTime currentDateTime) throws ParseException {
+	
+		if (isReset) {// 초기화 되었을떄만 그리기			
 			movieAreas = moviearea_connect.getMovieArea(movieKey, theaterKey, checkDayofweek % 7);// 영화 데이터 받기
-			for (int i = 0; i < movieAreas.size(); i++) {
+			for (int i = 0; i < movieAreas.size(); i++) {				
 				if (isCheckButton && isNoSchedule == false) {
+					System.out.println("ㅇ");
 					noSchedule.setVisible(false);
 					content[i].setText("<html>시작시간 : " + movieAreas.get(i).getStartTime() + "<br>제목 : " + movieName
 							+ escape1 + movieAreas.get(i).getHall() + escape2 + "남은 자리 :"
@@ -635,51 +619,21 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					content[i].setBorder(new LineBorder(purple, 1));
 					content[i].setMovieArea(movieAreas.get(i));// moviearea의 key
 					content[i].setVisible(true);
-					if (movieAreas.get(i).getVacantSeat() <= 0) {// 비어있는좌석 수가 없다면
+					// 비어있는좌석 수가 없다면
+					if (movieAreas.get(i).getVacantSeat() <= 0) {
 						content[i].setEnabled(false);
 					}
 				}
-				str = checkYear + "-" + (checkMonth + 1) + "-" + checkDay + " " + movieAreas.get(i).getStartTime();// 1월이
-																													// 0부터
-																													// 시작
-				Date movieDate = sdf.parse(str);
-				System.out.println(currentDate);
-				System.out.println(movieDate);
-				if (movieDate.compareTo(currentDate) < 0) {// 상영영화가 현재 시간보다 작으면
+				str = checkYear + "-" + checkMonth + "-" + checkDay + " " + movieAreas.get(i).getStartTime();
+				LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd H:mm"));
+				if (movieTime.compareTo(currentDateTime) < 0) {// 상영영화가 현재 시간보다 작으면
 					content[i].setEnabled(false);// 샹엉 불가능
 					System.out.println("문제2");
 				}
 			}
+			isReset = false;// 다 그린후에는 다시 false
 		}
-		isReset = false;// 다 그린후에는 다시 false
 
-	}
-
-	public String getDayOfweek(int dayofweek) {
-		switch (dayofweek) {
-		case 1:
-			weeksName = "일";
-			break;
-		case 2:
-			weeksName = "월";
-			break;
-		case 3:
-			weeksName = "화";
-			break;
-		case 4:
-			weeksName = "수";
-			break;
-		case 5:
-			weeksName = "목";
-			break;
-		case 6:
-			weeksName = "금";
-			break;
-		case 7:
-			weeksName = "토";
-			break;
-		}
-		return weeksName;
 	}
 
 	public void reset() {
@@ -700,7 +654,7 @@ class JKeyButton extends JButton {
 	private int year;
 	private int month;
 	private int day;
-	private int dayofweek;
+	private String dayofweek;
 
 	private MovieArea movieArea;
 
@@ -760,11 +714,11 @@ class JKeyButton extends JButton {
 		this.day = day;
 	}
 
-	public int getDayofweek() {
+	public String getDayofweek() {
 		return dayofweek;
 	}
 
-	public void setDayofweek(int dayofweek) {
+	public void setDayofweek(String dayofweek) {
 		this.dayofweek = dayofweek;
 	}
 
