@@ -1,6 +1,5 @@
 package page;
 
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -108,8 +107,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	private boolean isReset = false;
 	private String str = null;
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd HH:mm");
-	
-	
+
 	Color purple = new Color(82, 12, 139);
 
 	String weeksName = "";
@@ -121,7 +119,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 
 	private String escape1 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	private String escape2 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	
+
 	// 이미지
 	private ImageIcon imgSeoul = new ImageIcon("src/img/seoul.png");
 	private ImageIcon imgGyeonggi = new ImageIcon("src/img/gyeonggi.png");
@@ -293,7 +291,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		timePanel.setBackground(Color.WHITE);
 		timePanel.setLayout(null);
 		panel.add(timePanel);
-		//-----------------------------------------------------------------
+
 		// 날짜, 요일 마우스 위로 가져다 대면 연도 출력
 		for (int i = 0; i < yearMonthTable.length; i++) {
 			yearMonthTable[i] = new JLabel("XXXX년" + "XX월");
@@ -306,32 +304,12 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 			yearMonthTable[i].setBackground(purple);
 			timePanel.add(yearMonthTable[i]);
 		}
-
+		// -----------------------------------------------------------------
 		// 날짜
 		for (int i = 0; i < dayAndDayofTable.length; i++) {
-			switch (dayofweek) {
-			case 1:
-				weeksName = "일";
-				break;
-			case 2:
-				weeksName = "월";
-				break;
-			case 3:
-				weeksName = "화";
-				break;
-			case 4:
-				weeksName = "수";
-				break;
-			case 5:
-				weeksName = "목";
-				break;
-			case 6:
-				weeksName = "금";
-				break;
-			case 7:
-				weeksName = "토";
-				break;
-			}
+
+			weeksName = getDayOfweek(dayofweek);
+
 			dayAndDayofTable[i] = new JKeyButton(day + "*" + weeksName);
 			dayAndDayofTable[i].setYear(year);
 			dayAndDayofTable[i].setMonth(month);
@@ -359,8 +337,8 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 				dayofweek = 1;
 			}
 		}
-		//-------------------
-		
+		// -------------------
+
 		schedulePanel.setBounds(0, 150, 500, 400);
 		schedulePanel.setBackground(Color.WHITE);
 		schedulePanel.setLayout(null);
@@ -454,13 +432,9 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					checkDayofweek = dayAndDayofTable[i].getDayofweek();
 				}
 			}
+			
 			// 초기화
-			for (int i = 0; i < 4; i++) {
-				content[i].setEnabled(true);
-				content[i].setVisible(false);
-				content[i].setBackground(Color.WHITE);	
-			}
-			isReset = true;
+			reset();
 		}
 
 	}
@@ -471,15 +445,15 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (user.getUserID() != null) {
-				for(int i=0; i<content.length; i++) {
-					if(e.getSource() == content[i]) {
-						System.out.println("버튼: "+content[i].getMovieArea().get_key());
-						new MovieSitPage(user,content[i].getMovieArea());// 유저 정보와 영화 정보들 넘기기
+				for (int i = 0; i < content.length; i++) {
+					if (e.getSource() == content[i]) {
+						System.out.println("버튼: " + content[i].getMovieArea().get_key());
+						new MovieSitPage(user, content[i].getMovieArea());// 유저 정보와 영화 정보들 넘기기
 						dispose();
 					}
-					
+
 				}
-				
+
 			} else {
 				JOptionPane message = new JOptionPane();// 메시지 박스 객체
 				message.showMessageDialog(null, "로그인해주세요");
@@ -504,7 +478,6 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 				content[i].setVisible(false);
 				content[i].setBackground(Color.WHITE);
 			}
-			
 
 			// 서울 지역들
 			for (int i = 0; i < seoulArea.length; i++) {
@@ -529,7 +502,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 						isNoSchedule = true;
 					}
 				}
-				
+
 			}
 
 		}
@@ -577,105 +550,111 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 
 	@Override
 	public void run() {
-		
-		
-		  int se = 48; int m = 29; int h = 22;
-		 
+	
+		while (true) {// 무한반복
+			Date currentDate = new Date();//영화 시간비교,			 
+			
+			try {
+				
+				if (currentDate.getHours() == 23 && currentDate.getMinutes() == 59 && currentDate.getSeconds() == 59) {	//11시59분 59초
+					Calendar cal = Calendar.getInstance();// 현재 날짜		
+										
+					int year = cal.get(Calendar.YEAR);
+					int month = cal.get(Calendar.MONTH); // 월
+					int day = cal.get(Calendar.DATE);// 날짜
+					int dayofweek = cal.get(Calendar.DAY_OF_WEEK);// 요일
+					int endDate = cal.getActualMaximum(Calendar.DAY_OF_MONTH);// 이달의 마지막 날짜
+					System.out.println(year+","+(month+1)+","+day+","+dayofweek);
+					for (int i = 0; i < dayAndDayofTable.length; i++) {
 
-		while (true) {// 무한반복	
-			Date currentDate = new Date();
-			
-			// 동작확인 코드
-			
-			  currentDate.setMonth(10); currentDate.setDate(23); currentDate.setHours(h);
-			  currentDate.setMinutes(m); currentDate.setSeconds(se);
-			 
-			 
-			Calendar cal = Calendar.getInstance();//현재 날짜
-			dayofweek = cal.get(Calendar.DAY_OF_WEEK);//오늘 요일
-			try {	
-				/*
-				 * se++; System.out.println(se); System.out.println(currentDate);
-				 * Thread.sleep(1000); if(se>60) { m+=1; }
-				 */
-				//System.out.println(currentDate);
-				if(isCheckButton && isNoSchedule && movieAreas.size()<=0) {//데이터가 없다면
-					for(int i=0; i<content.length; i++) {
-						content[i].setVisible(false);
-					}
-					noSchedule.setVisible(true);
-				}
-				if(isReset) {
-					movieAreas = moviearea_connect.getMovieArea(movieKey, theaterKey, checkDayofweek % 7);//영화 데이터 받기	
-					for (int i = 0; i < movieAreas.size(); i++) {	
-						if(isCheckButton && isNoSchedule==false) {
-							noSchedule.setVisible(false);
-							content[i].setText("<html>시작시간 : " + movieAreas.get(i).getStartTime() + "<br>제목 : "
-									+ movieName + escape1 + movieAreas.get(i).getHall() + escape2 + "남은 자리 :"
-									+ movieAreas.get(i).getVacantSeat() + "/" + "216</html>");
-							content[i].setBackground(Color.WHITE);
-							content[i].setHorizontalAlignment(JButton.LEFT);
-							content[i].setBorder(new LineBorder(purple, 1));
-							content[i].setMovieArea(movieAreas.get(i));// moviearea의 key
-							content[i].setVisible(true);
-							if(movieAreas.get(i).getVacantSeat()<=0) {//비어있는좌석 수가 없다면
-								content[i].setEnabled(false);
+						weeksName = getDayOfweek(dayofweek);
+
+						dayAndDayofTable[i].setText(day + "**" + weeksName);
+						dayAndDayofTable[i].setYear(year);
+						dayAndDayofTable[i].setMonth(month);
+						dayAndDayofTable[i].setDay(day);
+						dayAndDayofTable[i].setDayofweek(dayofweek);
+						timePanel.add(dayAndDayofTable[i]);
+						dayofweek += 1;
+						day += 1;
+						if (day > endDate) {
+							day = 1;
+							month += 1;
+							if (month > 11) {
+								month = 0;
+								year += 1;
 							}
 						}
-						str = checkYear+"-"+(checkMonth+1)+"-"+checkDay+" "+movieAreas.get(i).getStartTime();//1월이 0부터 시작
-						Date movieDate = sdf.parse(str);
-						if(movieDate.compareTo(currentDate)<0) {//상영영화가 현재 시간보다 작으면	
-							content[i].setEnabled(false);//샹엉 불가능
+						if (dayofweek >= 8) {
+							dayofweek = 1;
 						}
+						
 					}
-				}isReset = false;
+					//isReset = true;
+					checkDayofweek+=1;
+					if(checkDayofweek>=8) {
+						checkDayofweek =0; 
+					}
+					reset();
+				}
 				
+				// System.out.println(currentDate);
+				IsnoScheduleVisible();
+				movieAreaContent(currentDate);
+
 			} catch (Exception e) {
-				// TODO: handle exception
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 	}
 
 	public void IsnoScheduleVisible() {
-		if(isCheckButton && isNoSchedule && movieAreas.size()<=0) {//데이터가 없다면
-			for(int i=0; i<content.length; i++) {
+		if (isCheckButton && isNoSchedule && movieAreas.size() <= 0) {// 데이터가 없다면
+			for (int i = 0; i < content.length; i++) {
 				content[i].setVisible(false);
 			}
 			noSchedule.setVisible(true);
 		}
 	}
-	
+
 	public void movieAreaContent(Date currentDate) throws ParseException {
-		if(isReset) {//초기화 되었을떄만 그리기
-			movieAreas = moviearea_connect.getMovieArea(movieKey, theaterKey, checkDayofweek % 7);//영화 데이터 받기	
-			for (int i = 0; i < movieAreas.size(); i++) {	
-				if(isCheckButton && isNoSchedule==false) {
+		if (isReset) {// 초기화 되었을떄만 그리기
+			
+			movieAreas = moviearea_connect.getMovieArea(movieKey, theaterKey, checkDayofweek % 7);// 영화 데이터 받기
+			for (int i = 0; i < movieAreas.size(); i++) {
+				if (isCheckButton && isNoSchedule == false) {
 					noSchedule.setVisible(false);
-					content[i].setText("<html>시작시간 : " + movieAreas.get(i).getStartTime() + "<br>제목 : "
-							+ movieName + escape1 + movieAreas.get(i).getHall() + escape2 + "남은 자리 :"
+					content[i].setText("<html>시작시간 : " + movieAreas.get(i).getStartTime() + "<br>제목 : " + movieName
+							+ escape1 + movieAreas.get(i).getHall() + escape2 + "남은 자리 :"
 							+ movieAreas.get(i).getVacantSeat() + "/" + "216</html>");
+					//content[i].setText(movieAreas.get(i).get_key()+"");
 					content[i].setBackground(Color.WHITE);
 					content[i].setHorizontalAlignment(JButton.LEFT);
 					content[i].setBorder(new LineBorder(purple, 1));
 					content[i].setMovieArea(movieAreas.get(i));// moviearea의 key
 					content[i].setVisible(true);
-					if(movieAreas.get(i).getVacantSeat()<=0) {//비어있는좌석 수가 없다면
+					if (movieAreas.get(i).getVacantSeat() <= 0) {// 비어있는좌석 수가 없다면
 						content[i].setEnabled(false);
 					}
 				}
-				str = checkYear+"-"+(checkMonth+1)+"-"+checkDay+" "+movieAreas.get(i).getStartTime();//1월이 0부터 시작
+				str = checkYear + "-" + (checkMonth + 1) + "-" + checkDay + " " + movieAreas.get(i).getStartTime();// 1월이
+																													// 0부터
+																													// 시작
 				Date movieDate = sdf.parse(str);
-				if(movieDate.compareTo(currentDate)<0) {//상영영화가 현재 시간보다 작으면	
-					content[i].setEnabled(false);//샹엉 불가능
+				System.out.println(currentDate);
+				System.out.println(movieDate);
+				if (movieDate.compareTo(currentDate) < 0) {// 상영영화가 현재 시간보다 작으면
+					content[i].setEnabled(false);// 샹엉 불가능
+					System.out.println("문제2");
 				}
 			}
-		}isReset= false;//다 그린후에는 다시 false
-		
+		}
+		isReset = false;// 다 그린후에는 다시 false
+
 	}
-	
+
 	public String getDayOfweek(int dayofweek) {
 		switch (dayofweek) {
 		case 1:
@@ -702,6 +681,15 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		}
 		return weeksName;
 	}
+
+	public void reset() {
+		for (int i = 0; i < 4; i++) {
+			content[i].setVisible(false);
+			content[i].setEnabled(true);
+			content[i].setBackground(Color.WHITE);
+		}
+		isReset = true;
+	}
 }
 
 class JKeyButton extends JButton {
@@ -713,7 +701,7 @@ class JKeyButton extends JButton {
 	private int month;
 	private int day;
 	private int dayofweek;
-	
+
 	private MovieArea movieArea;
 
 	public MovieArea getMovieArea() {

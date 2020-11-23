@@ -100,8 +100,6 @@ public class ChangeProfile extends JFrame {
    }
    
    class ChangeEvent implements ActionListener {
- 
-      
       
       public void actionPerformed(ActionEvent e) {
          for(int i = 0; i < radioButton.length; i++) {
