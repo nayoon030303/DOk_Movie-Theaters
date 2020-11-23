@@ -10,7 +10,7 @@ public class DB_MovieInfo {
 	private Statement st;
 	private ResultSet rs;
 	//private final static int MOVIE_NUM = 70;
-	private static  Movie[] movies;
+	private static  Movie[] movies; //백터로 바꾸기
 	
 	
 	public DB_MovieInfo() {
@@ -48,7 +48,10 @@ public class DB_MovieInfo {
 				movies[n].setOpen_day(rs.getString("open_day"));
 				movies[n].setAudience(rs.getInt("audience"));
 				movies[n].setRating(rs.getDouble("rating"));
-				
+				movies[n].setGrade(rs.getString("grade"));
+				movies[n].setCountry(rs.getString("country"));
+				movies[n].setRunning_time(rs.getInt("running_time"));
+				movies[n].setDisributor(rs.getString("distributor"));
 				n++;
 			}
 			
@@ -75,11 +78,16 @@ public class DB_MovieInfo {
 				 */
 				
 				movies[n] = new Movie();
+				movies[n].set_key(rs.getInt("_key"));
 				movies[n].setM_name(rs.getString("m_name"));
 				movies[n].setGenre(rs.getString("genre"));
 				movies[n].setOpen_day(rs.getString("open_day"));
 				movies[n].setAudience(rs.getInt("audience"));
 				movies[n].setRating(rs.getDouble("rating"));
+				movies[n].setGrade(rs.getString("grade"));
+				movies[n].setCountry(rs.getString("country"));
+				movies[n].setRunning_time(rs.getInt("running_time"));
+				movies[n].setDisributor(rs.getString("distributor"));
 				
 				n++;
 			}
@@ -90,7 +98,7 @@ public class DB_MovieInfo {
 		}
 		return movies;
 	}
-	
+
 	public int countMovie() {
 		int n = 0;
 		try {

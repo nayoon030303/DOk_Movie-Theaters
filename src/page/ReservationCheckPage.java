@@ -4,11 +4,22 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Arrays;
+import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import Movie.MovieArea;
+import User.User;
+import page.CategoryFrame.windowAdapter;
+import ticket.Ticket;
 
 public class ReservationCheckPage extends JFrame implements ActionListener {
 	private final static int PaddingLeft = 50;
@@ -18,31 +29,40 @@ public class ReservationCheckPage extends JFrame implements ActionListener {
 	//component
 	private JPanel panel = new JPanel();
 	
-	private JLabel NoP = new JLabel();	//Number of People
-	
 	private JLabel[] people = new JLabel[3];
 	private JLabel[] peoplePrice = new JLabel[3];
 	private JLabel result = new JLabel();
-	
 	private JLabel selectSit = new JLabel("선택하신 좌석입니다.");
-	private JLabel sit = new JLabel("좌석");
+	private JLabel sit = new JLabel();
+	private JLabel goContineu = new JLabel("결제를 진행하시겠습니까 ?");
+	private JButton sure = new JButton();
 	
-	private JLabel sure = new JLabel("결제를 진행하시겠습니까 ?");
-	private JButton sureBtn = new JButton();
-
+	//이미지
 	private ImageIcon imgSure = new ImageIcon("src/imges/sure.png");
 	
-	//Design
+	private Ticket ticket;
+	private User user;
+	private MovieArea movieArea;
+	int resultPrice;
+	
+	
+	//font
 	Font bold_font = new Font("나눔바른고딕", Font.BOLD, 25);
 	Font plain_font = new Font("나눔바른고딕", Font.PLAIN, 20);
 	Font result_font = new Font("나눔바른고딕", Font.BOLD, 30);
 	
-	public ReservationCheckPage(int num_adult, int num_teen, int num_kids) {
+	public ReservationCheckPage(User user,int num_adult, int num_teen, int num_kids, Vector<String> seat_name, Ticket ticket, MovieArea movieArea) {
+		
 		//금액 측정
 		int adultPrice = num_adult * 10000;
 		int teenPrice = num_teen * 8000;
 		int kidsPrice = num_kids * 5000;
-		int resultPrice = (adultPrice + teenPrice + kidsPrice);
+		resultPrice = (adultPrice + teenPrice + kidsPrice);
+		
+		//데이터 
+		this.user = user;
+		this.ticket = ticket;
+		this.movieArea = movieArea;
 		
 		//Price
 		for(int i = 0; i < people.length; i++) {
@@ -81,23 +101,30 @@ public class ReservationCheckPage extends JFrame implements ActionListener {
 		selectSit.setHorizontalAlignment(JLabel.LEFT);
 		panel.add(selectSit);
 		
-		sit.setBounds(PaddingLeft, PaddingTop + 425, 75, 50);
+		
+		
+		String[] seat_Name = new String[seat_name.size()];
+		for(int i=0; i<seat_name.size(); i++) {
+			seat_Name[i] = (String)seat_name.get(i);
+		}
+		Arrays.sort(seat_Name);//정렬 오름차순
+		sit.setText(Arrays.toString(seat_Name));
+		sit.setBounds(PaddingLeft, PaddingTop + 425, 400, 50);
 		sit.setFont(plain_font);
-		sit.setHorizontalAlignment(JLabel.CENTER);
 		panel.add(sit);
 		
 		//다음 페이지로 이동
-		sure.setBounds(PaddingLeft + 1, PaddingTop + 525, 300, 50);
-		sure.setFont(bold_font);
-		sure.setHorizontalAlignment(JLabel.LEFT);
+		goContineu.setBounds(PaddingLeft + 1, PaddingTop + 525, 300, 50);
+		goContineu.setFont(bold_font);
+		goContineu.setHorizontalAlignment(JLabel.LEFT);
+		panel.add(goContineu);
+		
+		sure.setIcon(imgSure);
+		sure.setBounds(PaddingLeft + 150,PaddingTop + 600,150,50);
+		sure.setBorderPainted(false);
 		panel.add(sure);
 		
-		sureBtn.setIcon(imgSure);
-		sureBtn.setBounds(PaddingLeft + 150,PaddingTop + 600,150,50);
-		sureBtn.setBorderPainted(false);
-		panel.add(sureBtn);
-		
-		sureBtn.addActionListener(this);
+		sure.addActionListener(this);
 		
 		
 		add(panel);
@@ -108,13 +135,29 @@ public class ReservationCheckPage extends JFrame implements ActionListener {
 		setSize(500, 900);
 		setVisible(true);
 		setResizable(false);
+		setDefaultCloseOperation (JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new windowAdapter());
+		
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == sureBtn) {
-			new PayPage();
+		if(e.getSource() == sure) {
+			ticket.setPrice(resultPrice);
+			ticket.setSeatWhere(sit.getText());
+			new PayPage(user,ticket, movieArea);
 			dispose();
 		}
+	}
+	class windowAdapter extends WindowAdapter{
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+	        int result = JOptionPane.showConfirmDialog(null,"예매를 취소하시겠습니까?");
+	        if (result==JOptionPane.OK_OPTION) {
+	     	   dispose();
+	     	   new DOKPage(user);
+	        }
+		}  
 	}
 }

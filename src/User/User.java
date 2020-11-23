@@ -2,10 +2,12 @@ package User;
 
 
 public class User {
-	private String userID, userPassword, userName, useryymmdd, userGender, userPhone, userTaste1, userTaste2;
+	private String userID, userPassword, userName, useryymmdd, userGender, userPhone, userTaste1;
+	private boolean isLogin;
+	private String userProfile;
 	public User() {}
 	//8°¡Áö
-	public User(String userID,String userPassword, String userName, String useryymmdd, String userGender, String userPhone, String userTaste1, String userTaste2) {
+	public User(String userID,String userPassword, String userName, String useryymmdd, String userGender, String userPhone, String userTaste1,  boolean isLogin) {
 		this.userID = userID;
 		this.userPassword = userPassword;
 		this.userName = userName;
@@ -13,7 +15,7 @@ public class User {
 		this.userGender = userGender;
 		this.userPhone = userPhone;
 		this.userTaste1 = userTaste1;
-		this.userTaste2 = userTaste2;
+		this.isLogin = isLogin;
 	}
 	public String getUserID() {
 		return userID;
@@ -57,11 +59,17 @@ public class User {
 	public void setUserTaste1(String userTaste1) {
 		this.userTaste1 = userTaste1;
 	}
-	public String getUserTaste2() {
-		return userTaste2;
+	public boolean getUserIsLogin() {
+		return isLogin;
 	}
-	public void setUserTaste2(String userTaste2) {
-		this.userTaste2 = userTaste2;
+	public void setUserIsLogin(boolean isLogin) {
+		this.isLogin = isLogin;
+	}
+	public String getUserProfile() {
+		return userProfile;
+	}
+	public void setUserProfile(String userProfile) {
+		this.userProfile = userProfile;
 	}
 	
 

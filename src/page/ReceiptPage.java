@@ -15,7 +15,7 @@ public class ReceiptPage extends JFrame {
 	private JPanel panel = new JPanel();
 	
 	//영수증
-	JLabel movieN = new JLabel("영화 이름");	//변수에 선택한 영화 이름 받아오기
+	JLabel movieName = new JLabel("영화 이름");	//변수에 선택한 영화 이름 받아오기
 	JLabel date = new JLabel();		//현 시각
 	JLabel sit = new JLabel();		//좌석 ex) C15
 	JLabel adult = new JLabel();	//성인

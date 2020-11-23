@@ -11,8 +11,7 @@ public class DB_Theater {
 	private Connection con;
 	private Statement st;
 	private ResultSet rs;
-	private final static int AREA_NUM = 70;
-	private Theater[] areas = new Theater[AREA_NUM];
+	private Theater[] theaters;
 	
 	
 	public DB_Theater() {
@@ -23,6 +22,8 @@ public class DB_Theater {
 		}catch (Exception e) {
 			System.out.println("데이터 베이스 연결 오류:"+e.getMessage());
 		}
+		theaters = new Theater[countTheater()];
+		//System.out.println(countTheater());
 	}
 	
 	
@@ -50,11 +51,11 @@ public class DB_Theater {
 			rs = st.executeQuery(SQL);
 			int n = 0;
 			while(rs.next()) {
-				areas[n] = new Theater();
-				areas[n].set_key(rs.getInt("_key"));
-				areas[n].setArea(rs.getString("area"));
-				areas[n].setCountry(rs.getString("country"));
-				areas[n].setNumHall(rs.getInt("numHall"));
+				theaters[n] = new Theater();
+				theaters[n].set_key(rs.getInt("_key"));
+				theaters[n].setArea(rs.getString("area"));
+				theaters[n].setCountry(rs.getString("country"));
+				theaters[n].setNumHall(rs.getInt("numHall"));
 				
 				n++;
 			}
@@ -63,7 +64,30 @@ public class DB_Theater {
 			// TODO: handle exception
 			System.out.println("getArea데이터베이스 검색 오류:"+ e.getLocalizedMessage());
 		}
-		return areas;
+		return theaters;
+		
+	}
+	public Theater[] getTheater(String area) {
+		try {
+			String SQL = "SELECT* FROM theaterinfo where area like \""+area+"\";";
+			//System.out.println(SQL);
+			rs = st.executeQuery(SQL);
+			int n = 0;
+			while(rs.next()) {
+				theaters[n] = new Theater();
+				theaters[n].set_key(rs.getInt("_key"));
+				theaters[n].setArea(rs.getString("area"));
+				theaters[n].setCountry(rs.getString("country"));
+				theaters[n].setNumHall(rs.getInt("numHall"));
+				
+				n++;
+			}
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("getArea데이터베이스 검색 오류:"+ e.getLocalizedMessage());
+		}
+		return theaters;
 		
 	}
 	

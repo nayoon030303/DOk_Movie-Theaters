@@ -1,15 +1,18 @@
 package Movie;
 
 public class Movie {
-	
-	
-	
+
 	private int _key;
-	private String m_name,genre,open_day;
+	private String m_name, genre, open_day;
 	private int audience;
 	private double rating;
-	public Movie() {}
-	
+	private String grade;
+	private String country;
+	private int running_time;
+	private String disributor;
+	public Movie() {
+	}
+
 	public Movie(int _key, String m_name, String genre, String open_day, int audience, double rating) {
 		this._key = _key;
 		this.m_name = m_name;
@@ -18,15 +21,15 @@ public class Movie {
 		this.audience = audience;
 		this.rating = rating;
 	}
-	
+
 	public int get_key() {
 		return _key;
 	}
-	
+
 	public void set_key(int _key) {
 		this._key = _key;
 	}
-	
+
 	public String getM_name() {
 		return m_name;
 	}
@@ -66,4 +69,37 @@ public class Movie {
 	public void setRating(double rating) {
 		this.rating = rating;
 	}
+
+	public String getGrade() {
+		return grade;
+	}
+
+	public void setGrade(String grade) {
+		this.grade = grade;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public int getRunning_time() {
+		return running_time;
+	}
+
+	public void setRunning_time(int running_time) {
+		this.running_time = running_time;
+	}
+
+	public String getDisributor() {
+		return disributor;
+	}
+
+	public void setDisributor(String disributor) {
+		this.disributor = disributor;
+	}
+	
 }

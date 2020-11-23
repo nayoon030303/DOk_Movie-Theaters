@@ -14,11 +14,11 @@ public class MakeTheater {
 		DB_Theater connect = new DB_Theater();
 		
 		//서울
-		for(int i=0; i<4; i++) {	
+		for(int i=0; i<3; i++) {	
 			System.out.println(connect.makeMovie_Theater(area[0], s1[i], 5));
 		}
 		//경기
-		for(int i=0; i<4; i++) {	
+		for(int i=0; i<3; i++) {	
 			System.out.println(connect.makeMovie_Theater(area[1], s2[i], 5));
 		}
 		
@@ -28,7 +28,7 @@ public class MakeTheater {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//new MakeTheater();
+		new MakeTheater();
 	}
 
 }

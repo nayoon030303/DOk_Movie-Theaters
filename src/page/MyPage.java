@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 import User.User;
 
@@ -48,9 +49,12 @@ public class MyPage extends CategoryFrame{
 	ImageIcon imgRecord = new ImageIcon("src/imges/record.png");
 	ImageIcon imgReInfo = new ImageIcon("src/imges/re_info.png");
 	ImageIcon imgReProfile = new ImageIcon("src/imges/re_profile.png");
-	ImageIcon imgOctopus = new ImageIcon("src/imges/P_octopus.png");
+	//프로필 사진들
+	ImageIcon userIcon;
+
 	
-	
+	Color purple = new Color(82, 12, 139);
+
 	
 	public MyPage() {}
 	public MyPage(User user) {
@@ -58,17 +62,19 @@ public class MyPage extends CategoryFrame{
 		super("마이 페이지");
 		setSize(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
 		setResizable(false);//창크기 조정x
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setLayout(null);//레이아웃 null
 		setVisible(true);
 		
 		this.user = user;
 		
 		//프로필 사진
+		String str ="src/imges/"+user.getUserProfile()+".png";
+		userIcon = new ImageIcon(str);
 		profile_img.setBounds(POS_X_LEFT, PaddingTop, 400, 400);
 		profile_img.setOpaque(false);
 		profile_img.setBackground(Color.RED);
-		profile_img.setIcon(imgOctopus);
+		profile_img.setIcon(userIcon);
 		panel.add(profile_img);
 		
 		//사용자 이름
@@ -130,8 +136,6 @@ public class MyPage extends CategoryFrame{
 		btn_modify_Info.addActionListener(new BtnEvent());
 		panel.add(btn_modify_Info);
 		
-	
-		
 		//최근 예매한 영화 label
 		record_movie.setBounds(POS_X_CENTER - 50, PaddingTop + 300, 250, 50);
 		record_movie.setOpaque(false);
@@ -139,8 +143,11 @@ public class MyPage extends CategoryFrame{
 		panel.add(record_movie);
 		
 		//최근 예매한 영화
+		record_movieInfo.setText("아직 최근 예매하신 내역이 없으시네요 !");
+		record_movieInfo.setHorizontalAlignment(JLabel.CENTER);
 		record_movieInfo.setBounds(POS_X_CENTER - 50, PaddingTop + 365, 650, 250);
 		record_movieInfo.setFont(font2);
+		record_movieInfo.setBorder(new LineBorder(purple, 1));
 		panel.add(record_movieInfo);
 		
 		
@@ -159,12 +166,17 @@ public class MyPage extends CategoryFrame{
 			if(e.getSource() == btn_modify_Info) {
 				String pw = JOptionPane.showInputDialog(null,"비밀번호를 입력해주세요");
 				if(pw.equals(user.getUserPassword())) {
+					new UserInformationPage(user);
 					dispose();
-					new P_InformationPage(user);
 				}else {
 					JOptionPane.showMessageDialog(null, "비밀번호가 일치하지 않습니다.");
 				}
 				
+			}
+			
+			if(e.getSource() == btn_modify_Profile) {
+				new ChangeProfile(user);
+				dispose();
 			}
 		}
 		

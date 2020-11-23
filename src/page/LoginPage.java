@@ -18,124 +18,149 @@ import User.DB_userInfo;
 import User.User;
 
 public class LoginPage extends JFrame{
+	
 	//위치 
-	private final static int C_X = Main.SCREEN_WIDTH/2+200;
+	private final static int C_X = 150;
 	private final static int IDLable_Y = 200;
-	private final static int IDTextF_Y = 300;
+	private final static int IDTextF_Y = 290;
 	private final static int PWLable_Y = 400;
-	private final static int PWTextF_Y = 500;
+	private final static int PWTextF_Y = 490;
 	private final static int LoginBtn_Y = 700;
 	
-	
+	//user
 	private  User user = new User();
 	
 	//component
-	private JPanel jpanel = new JPanel();
-	private JLabel jlId = new JLabel("ID");
-	private JTextField jtId = new JTextField();
-	private JLabel jlPw = new JLabel("PassWord");
-	private JPasswordField jtPw = new JPasswordField();
-	private JButton jbtnLogin = new JButton();
-	private JButton jbtnSingUp = new JButton();
+	private JPanel panel = new JPanel();
+	private JButton iconBack = new JButton();
+	private JLabel id = new JLabel("ID");
+	private JTextField inputId = new JTextField();
+	private JLabel password = new JLabel("PassWord");
+	private JPasswordField inputPassword = new JPasswordField();
+	private JButton iconLogin = new JButton();
+	private JButton iconSignUp = new JButton();
+	private JLabel logo = new JLabel();
+
+	//이미지
 	private ImageIcon imgLogo = new ImageIcon("src/imges/dok.png");
-	private JLabel jlLogo = new JLabel();
-	private JLabel designImg = new JLabel();
 	
+	//DB연결 클래스
+	private DB_userInfo connection = new DB_userInfo();	
 	
-	
-	private DB_userInfo connection = new DB_userInfo();	//DB연결 클래스
 	private String userID,userPassword;
 	
+	//이미지
+	private ImageIcon imgLogin = new ImageIcon("src/img/btnLogin.png");
+	private ImageIcon imgSignup = new ImageIcon("src/img/btnSignup.png");
+	private ImageIcon imgBack = new ImageIcon("src/img/back.png");
+	
 	//font
+	private Font Logo = new Font("Franklin Gothic Heavy", Font.PLAIN, 120);
 	private Font font1 = new Font("나눔바른고딕", Font.BOLD, 30);
 	private Font font2 = new Font("나눔바른고딕", Font.PLAIN, 20);
 	
 	public LoginPage() {
 		super("Login");
-		setSize(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
+		setSize(600, Main.SCREEN_HEIGHT);
 		setResizable(false);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setLayout(null);	//레이아웃 null
 		setVisible(true);	
 		
 		//패널
-		jpanel.setBounds(0,0,Main.SCREEN_WIDTH,Main.SCREEN_HEIGHT);
-		jpanel.setBackground(Color.WHITE);
-		jpanel.setLayout(null);
-		add(jpanel);
+		panel.setBounds(0,0,600,Main.SCREEN_HEIGHT);
+		panel.setBackground(Color.WHITE);
+		panel.setLayout(null);
+		add(panel);
 		
 		// 이미지 label
-		jlLogo.setIcon(imgLogo);
-		jlLogo.setBounds(300, 125,200,100);
-		jpanel.add(jlLogo);
+		//jlLogo.setIcon(imgLogo);
+		logo.setText("DoK");
+		logo.setFont(Logo);
+		logo.setBounds(175, 50,275,100);
+		panel.add(logo);
 		
-		designImg.setBounds(100, 300, 600, 600);
-		designImg.setOpaque(true);
-		designImg.setBackground(Color.ORANGE);
-		jpanel.add(designImg);
+		iconBack.setIcon(imgBack);
+		iconBack.setBounds(5, 15, 100, 40);
+		iconBack.setOpaque(true);
+		iconBack.setBackground(Color.WHITE);
+		iconBack.setBorderPainted(false);
+		panel.add(iconBack);
 		
 		
 		//아이디 label
-		jlId.setBounds(C_X,IDLable_Y,200,100);
-		jlId.setFont(font1);
-		jpanel.add(jlId);
+		id.setBounds(C_X,IDLable_Y,200,100);
+		id.setFont(font1);
+		panel.add(id);
 		
 		//아이디 textField
-		jtId.setBounds(C_X, IDTextF_Y, 250, 50);
-		jtId.setFont(font2);
-		jpanel.add(jtId);
+		inputId.setBounds(C_X, IDTextF_Y, 250, 50);
+		inputId.setFont(font2);
+		panel.add(inputId);
 		
 		//패스워드 label
-		jlPw.setBounds(C_X,PWLable_Y,200,100);
-		jlPw.setFont(font1);
-		jpanel.add(jlPw);
+		password.setBounds(C_X,PWLable_Y,200,100);
+		password.setFont(font1);
+		panel.add(password);
 		
 		//패스워드 textField
-		jtPw.setBounds(C_X,PWTextF_Y,250,50);
-		jtPw.setFont(font2);
-		jpanel.add(jtPw);
+		inputPassword.setBounds(C_X,PWTextF_Y,250,50);
+		inputPassword.setFont(font2);
+		panel.add(inputPassword);
 		
 		//로그인 버튼
-		jbtnLogin.setText("로그인");
-		jbtnLogin.setFont(font1);
-		jbtnLogin.setBounds(C_X,LoginBtn_Y,300,80);
-		jpanel.add(jbtnLogin);
+		iconLogin.setIcon(imgLogin);
+		iconLogin.setBounds(C_X,LoginBtn_Y,300,80);
+		iconLogin.setBorderPainted(false);
+		panel.add(iconLogin);
 		
 		//회원가입 버튼
-		jbtnSingUp.setText("회원가입");
-		jbtnSingUp.setBounds(C_X,LoginBtn_Y+100,300,80);
-		jbtnSingUp.setFont(font1);
-		jpanel.add(jbtnSingUp);
+		iconSignUp.setIcon(imgSignup);
+		iconSignUp.setBounds(C_X,LoginBtn_Y+100,300,80);
+		iconSignUp.setBorderPainted(false);
+		panel.add(iconSignUp);
 		
-		jbtnLogin.addActionListener(new EventHandler());
-		jbtnSingUp.addActionListener(new EventHandler());
+		iconBack.addActionListener(new EventHandler());
+		iconLogin.addActionListener(new EventHandler());
+		iconSignUp.addActionListener(new EventHandler());
 			
 	}
 	class EventHandler implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(e.getSource()==jbtnLogin) {//로그인 버튼
+			if(e.getSource()==iconLogin) {//로그인 버튼
 				
-				userID = jtId.getText();
-				userPassword = jtPw.getText();
+				userID = inputId.getText();
+				userPassword = inputPassword.getText();
 				//System.out.println(connection.getUserInfo(userID).getUserID());
 				boolean success = connection.isUser(userID, userPassword);
 				if(success) {//성공
-					user = connection.getUserInfo(userID);
-					new DOKPage(user);
+					success = connection.isLogin(userID);
+					if(success) {
+						user = connection.getUserInfo(userID);
+						connection.updateIsLogin(userID);
+						System.out.println(user.getUserIsLogin());
+						new DOKPage(user);
+						setVisible(false);
+					}else {
+						JOptionPane message =new JOptionPane();//메시지 박스 객체
+						message.showMessageDialog(null,"이미 로그인처리가 되어있습니다." );
+					}
 					
-					setVisible(false);
 				}else {
 					JOptionPane message =new JOptionPane();//메시지 박스 객체
 					message.showMessageDialog(null,"아이디 또는 패스워드가 맞지 않습니다. 확인 후  입력해주세요" );
 				}
 				
 				
-			}else if(e.getSource() == jbtnSingUp) {//회원가입 버튼
+			}else if(e.getSource() == iconSignUp) {//회원가입 버튼
 				new SignUpPage();
 				//dispose();
 				//setVisible(false);
+			}else if(e.getSource() == iconBack) {
+				dispose();
+				new DOKPage(user);
 			}
 			
 		}
