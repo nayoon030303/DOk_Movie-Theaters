@@ -129,7 +129,7 @@ public class PayTimer extends JFrame {
       
       //connect_ticket.addTicket(ticket.getUserID(), ticket.getMovieareaKey(), ticket.getPrice(), ticket.getSeatCount(), ticket.getSeatWhere(),ticket.getYymmdd(), ticket.getPayHow());
       
-      //connect_movieArea.updateMovieArea(movieArea.get_key(),movieArea.getVacantSeat()-ticket.getSeatCount(), movieArea.getSeatState());
+      connect_movieArea.updateMovieArea(movieArea.get_key(),movieArea.getVacantSeat()-ticket.getSeatCount(), movieArea.getSeatState());
       
       Timer2 t2 = new Timer2(this,iconLoading,user);
       t2.start();

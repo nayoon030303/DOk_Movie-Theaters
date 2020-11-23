@@ -92,6 +92,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	//
 	private Movie[] movie;
 	private Vector<MovieArea> movieAreas = new Vector<MovieArea>();
+	private Vector<MovieArea> movieAreass = new Vector<MovieArea>();
 	private Theater[] theater;
 	private Area[] area;
 	private String movieName;
@@ -106,6 +107,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	private boolean isCheckButton = false;
 	private boolean isNoSchedule = false;
 	private boolean isReset = false;
+	private int none = 0;
 	private String str = null;
 	 
 
@@ -450,7 +452,6 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 			if (user.getUserID() != null) {
 				for (int i = 0; i < content.length; i++) {
 					if (e.getSource() == content[i]) {
-						System.out.println("버튼: " + content[i].getMovieArea().get_key());
 						new MovieSitPage(user, content[i].getMovieArea());// 유저 정보와 영화 정보들 넘기기
 						dispose();
 					}
@@ -516,7 +517,6 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		JKeyButton m = (JKeyButton) e.getSource();
 		movieName = m.getText();
 		movieKey = m.getMovieKey();// 영화 프라이머리_key가져오기
-		System.out.println(movieKey);
 		for (int i = 0; i < movieNum; i++) {
 			btn_movie[i].setBackground(Color.WHITE);
 			btn_movie[i].setForeground(Color.BLACK);
@@ -567,7 +567,6 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					int day = currentDateTime.getDayOfMonth();// 날짜
 					String dayofweek = currentDateTime.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);// 요일
 					//int endDate = cal.getActualMaximum(Calendar.DAY_OF_MONTH);// 이달의 마지막 날짜
-					System.out.println(year + "," + (month + 1) + "," + day + "," + dayofweek);
 					for (int i = 0; i < dayAndDayofTable.length; i++) {
 					
 						dayAndDayofTable[i].setText(day + "**" + dayofweek);
@@ -581,8 +580,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					reset();
 				}
 
-				// System.out.println(currentDate);
-				IsnoScheduleVisible();
+				
 				movieAreaContent(currentDateTime);
 
 			} catch (Exception e) {
@@ -593,24 +591,20 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 
 	}
 
-	public void IsnoScheduleVisible() {
-		if (isCheckButton && isNoSchedule && movieAreas.size() <= 0) {// 데이터가 없다면
-			for (int i = 0; i < content.length; i++) {
-				content[i].setVisible(false);
-			}
-			noSchedule.setVisible(true);
-		}
-	}
-
 	public void movieAreaContent(LocalDateTime currentDateTime) throws ParseException {
-	
-		if (isReset) {// 초기화 되었을떄만 그리기			
+		while(isReset) {
 			movieAreas = moviearea_connect.getMovieArea(movieKey, theaterKey, checkDayofweek % 7);// 영화 데이터 받기
+			if (isCheckButton && isNoSchedule && movieAreas.size()<=0 ) {// 데이터가 없다면
+				for (int i = 0; i < content.length; i++) {
+					content[i].setVisible(false);
+				}
+				noSchedule.setVisible(true);
+			}			
 			for (int i = 0; i < movieAreas.size(); i++) {				
+				//System.out.println(movieAreas.get(i).get_key());
 				if (isCheckButton && isNoSchedule == false) {
-					System.out.println("ㅇ");
 					noSchedule.setVisible(false);
-					content[i].setText("<html>시작시간 : " + movieAreas.get(i).getStartTime() + "<br>제목 : " + movieName
+					content[i].setText("<html> " + +movieAreas.get(i).get_key()+"시작시간 :"+movieAreas.get(i).getStartTime() + "<br>제목 : " + movieName
 							+ escape1 + movieAreas.get(i).getHall() + escape2 + "남은 자리 :"
 							+ movieAreas.get(i).getVacantSeat() + "/" + "216</html>");
 					//content[i].setText(movieAreas.get(i).get_key()+"");
@@ -621,18 +615,23 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					content[i].setVisible(true);
 					// 비어있는좌석 수가 없다면
 					if (movieAreas.get(i).getVacantSeat() <= 0) {
-						content[i].setEnabled(false);
+						content[i].setEnabled(false);									
+					}else {
+						content[i].setEnabled(true);
 					}
+					str = checkYear + "-" + checkMonth + "-" + checkDay + " " + movieAreas.get(i).getStartTime();
+					LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd H:mm"));
+					if (movieTime.compareTo(currentDateTime) < 0) {// 상영영화가 현재 시간보다 작으면
+						content[i].setEnabled(false);// 샹엉 불가능
+					} 
+					
+				}else {
+					isReset = false;
 				}
-				str = checkYear + "-" + checkMonth + "-" + checkDay + " " + movieAreas.get(i).getStartTime();
-				LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd H:mm"));
-				if (movieTime.compareTo(currentDateTime) < 0) {// 상영영화가 현재 시간보다 작으면
-					content[i].setEnabled(false);// 샹엉 불가능
-					System.out.println("문제2");
-				}
+				
 			}
-			isReset = false;// 다 그린후에는 다시 false
 		}
+		
 
 	}
 
