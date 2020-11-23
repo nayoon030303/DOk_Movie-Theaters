@@ -646,7 +646,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 						checkDayE = String.valueOf(checkDay);
 					}
 					str = checkYear + "-" + checkMonthE + "-" + checkDayE + " " + movieAreas.get(i).getStartTime();
-					System.out.println(str);
+					// System.out.println(str);
 					LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm"));
 					if (movieTime.compareTo(currentDateTime) <=0) {// 상영영화가 현재 시간보다 작으면 또는 같은면
 						content[i].setEnabled(false);// 샹엉 불가능

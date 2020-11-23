@@ -6,21 +6,19 @@ import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
 
+import Movie.DB_MovieArea;
+import Movie.MovieArea;
 import User.User;
 
 public class Test1 {
 	static User user = new User();
 
 	public static void main(String[] args) {
-		LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
-		String str = "2020-11-27 19:40";
-		LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm"));
+		DB_MovieArea connect = new DB_MovieArea(); 
 		
-		if (movieTime.compareTo(currentDateTime) <= 0) {// 상영영화가 현재 시간보다 작으면
-			System.out.println("문제2");
-		}else {
-			System.out.println("가능");
-		}
+		MovieArea movieArea = connect.getMovieArea(224);
 		
+		Thread t1 = new Thread(new Test(user, movieArea));
+		t1.start();
 	}
 }

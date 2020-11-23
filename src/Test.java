@@ -1,678 +1,353 @@
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.border.LineBorder;
 
-import Area.Area;
-import Area.DB_Area;
 import Movie.DB_MovieArea;
-import Movie.DB_MovieInfo;
-import Movie.Movie;
 import Movie.MovieArea;
 import User.User;
 import page.CategoryFrame;
-import page.DOKPage;
 import page.Main;
-import page.MovieSitPage;
-import theater.DB_Theater;
-import theater.Theater;
+import page.ReservationCheckPage;
+import ticket.Ticket;
 
-public class Test extends CategoryFrame implements ActionListener, Runnable {
-	private final static int PaddingLeft = 40;
-	private final static int PaddingTop = 100;
-	private final static double Panel_Height = 700;
-
-	// 날짜
-	private Calendar cal = Calendar.getInstance();
-
-	// size
-	private Dimension size = new Dimension();// 사이즈를 지정하기 위한 객체 생성
+public class Test extends CategoryFrame implements Runnable {
+	private final static int PaddingLeft = 150;
+	private final static int PaddingTop = 125;
 
 	// component
 	private JPanel panel = new JPanel();
-	private JPanel moviePanel = new JPanel();
-	private JPanel areaPanel = new JPanel();
-	private JPanel timePanel = new JPanel();
+	private JLabel screen = new JLabel("SCREEN");
+	private JButton[][] sit = new JButton[9][24];
+	private int[][] int_selectedSit = new int[9][24];// 선택된 자석들 1
+	private JButton gray = new JButton(); // gray색 버튼
+	private String[] str_number = { "0", "1", "2", "3", "4", "5", "6", "7", "8" };
+	private JLabel adult = new JLabel("성인");
+	private JComboBox comboboxAdult = new JComboBox(str_number);
+	private JLabel teen = new JLabel("청소년");
+	private JComboBox comboboxTeen = new JComboBox(str_number);
+	private JLabel kids = new JLabel("어린이");
+	private JComboBox comboboxKids = new JComboBox(str_number);
+	private JButton next = new JButton();
+	private JLabel[] row = new JLabel[24];
+	private JLabel[] column = new JLabel[9];
+	private JLabel[] selectRow = new JLabel[24];
+	private JLabel[] selectColumn = new JLabel[9];
+	private Vector<String> seatName = new Vector<String>();
 
-	// 영화
-	private JLabel titleMovie = new JLabel("영화");
-	private JLabel iconMovie = new JLabel();
-	private JPanel movieListPanel = new JPanel();
-	private JPanel schedulePanel = new JPanel();
-	// private JLabel[] oster = new JLabel[3];
+	private ImageIcon imgNext = new ImageIcon("src/imges/next.png");
 
-	// 지역
-	private JLabel titleArea = new JLabel("지역");
-	private JLabel iconArea = new JLabel();
-	private JButton SEOUL = new JButton("서울");
-	private JButton GYEONGGI = new JButton("경기");
-	private JKeyButton[] seoulArea;
-	private JKeyButton[] gyeonggiArea;
-	private JScrollPane TimescrollPanel;
+	private int num_adult = 0;
+	private int num_teen = 0;
+	private int num_kids = 0;
+	private String select = "";
+	private int count = 0;
+	private int selectCount = 0;
 
-	// 시간
-	private JKeyButton[] dayAndDayofTable = new JKeyButton[7];
-	private JKeyButton[] content = new JKeyButton[4];
-	JKeyButton[] btn_movie;
-	private JLabel[] yearMonthTable = new JLabel[7];
-	private JLabel noSchedule = new JLabel();
-	// DB
-	private DB_MovieInfo movie_connect = new DB_MovieInfo();
-	private DB_MovieArea moviearea_connect = new DB_MovieArea();
-	private DB_Theater theater_connect = new DB_Theater();
-	private DB_Area area_connect = new DB_Area();
-
-	//
-	private Movie[] movie;
-	private Vector<MovieArea> movieAreas = new Vector<MovieArea>();
-	private Theater[] theater;
-	private Area[] area;
-	private String movieName;
-	private int movieKey;
-	private String areaKey;
-	private String countryKey;
-	private int theaterKey;
-	private int checkYear;
-	private int checkMonth;
-	private int checkDay;
-	private int checkDayofweek;
-	private int year;
-	private int month;
-	private int day;
-	private int dayofweek;
-	private int endDate;
-
-	Color purple = new Color(82, 12, 139);
-
-	String weeksName = "";
-
-	// count
-	private int movieCount = 0;
-	private int countryCount = 0;
-	private int movieNum;
-
-	// 이미지
-	private ImageIcon imgSeoul = new ImageIcon("src/img/seoul.png");
-	private ImageIcon imgGyeonggi = new ImageIcon("src/img/gyeonggi.png");
-	private ImageIcon imgMovie = new ImageIcon("src/img/clapperboard.png");
-	private ImageIcon imgArea = new ImageIcon("src/img/worldwide.png");
-	private ImageIcon imgNoSchedule = new ImageIcon("src/img/noSchedule.png");
+	private MovieArea movieArea;
+	private Ticket ticket = new Ticket();
+	private String seatState;
 
 	// Design
-	Font namefont = new Font("나눔바른고딕", Font.PLAIN, 17);
-	Font boldfont = new Font("나눔바른고딕", Font.BOLD, 20);
-	Font font1 = new Font("나눔바른고딕", Font.PLAIN, 25);
-	Font font2 = new Font("나눔바른고딕", Font.PLAIN, 20);
+	private Font sit_font = new Font("나눔바른고딕", Font.BOLD, 15);
+	private Font people = new Font("나눔바른고딕", Font.PLAIN, 25);
 
-	public Test() {
-	}
+	// DB
+	private DB_MovieArea connect_movieArea = new DB_MovieArea();
 
-	public Test(User user) {
-		super("예매");
-
+	public Test(User user, MovieArea movieArea) {
+		super("영화 좌석 선택");
 		setSize(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
 		setResizable(false);
 		// setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setLayout(null); // 레이아웃 null
 		setVisible(true);
-		setBackground(Color.WHITE);
 
-		// 날짜
-		// cal.set(Calendar.YEAR,2020);
-		// cal.set(Calendar.MONTH,10);
-		// cal.set(Calendar.DATE,27);
-		year = cal.get(Calendar.YEAR);
-		month = cal.get(Calendar.MONTH); // 월
-		day = cal.get(Calendar.DATE);// 날짜
-		dayofweek = cal.get(Calendar.DAY_OF_WEEK);// 요일
-		endDate = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-		areaKey = "서울";
-
-		// 데어터 연결
-		area = area_connect.getArea();
-		theater = theater_connect.getTheater(areaKey);
-		movie = movie_connect.getMovieInfoAll("open_day");
+		// 정보 연결
 		this.user = user;
+		this.movieArea = movieArea;
+		seatState = movieArea.getSeatState();
 
-		// 서울,경기
-		seoulArea = new JKeyButton[theater.length / 2];
-		gyeonggiArea = new JKeyButton[theater.length / 2];
+		// ticket에 정보 set
+		ticket.setUserID(user.getUserID());
+		ticket.setMovieareaKey(movieArea.get_key());
 
-		// 영화 패널
-		moviePanel.setBounds(PaddingLeft, PaddingTop, 400, 600);
-		moviePanel.setOpaque(true);
-		moviePanel.setBackground(Color.WHITE);
-		moviePanel.setLayout(null);
-		panel.add(moviePanel);
+		gray.setBackground(Color.LIGHT_GRAY);
 
-		titleMovie.setBounds(5, 5, 60, 40);
-		titleMovie.setFont(font1);
-		titleMovie.setHorizontalAlignment(JLabel.CENTER);
-		moviePanel.add(titleMovie);
-
-		iconMovie.setIcon(imgMovie);
-		iconMovie.setBounds(67, 0, 50, 50);
-		iconMovie.setOpaque(true);
-		iconMovie.setBackground(Color.WHITE);
-		moviePanel.add(iconMovie);
-
-		// 영화 패널
-		movieListPanel.setOpaque(true);
-		movieListPanel.setBackground(Color.DARK_GRAY);
-		movieListPanel.setLayout(null);
-		movieListPanel.setPreferredSize(size);
-
-		// 영화 추가 ////////////////////////////////////////////////////
-
-		movieNum = 14;// 14개의 영화만 상영
-		size.setSize(400, movieNum * 50);
-		btn_movie = new JKeyButton[movieNum];
-		for (int i = 0; i < movieNum; i++) {
-			btn_movie[i] = new JKeyButton();
-			btn_movie[i].setHorizontalAlignment(JButton.LEFT);
-			btn_movie[i].setMovieKey(movie[i].get_key());
-			btn_movie[i].setText(movie[i].getM_name());
-			btn_movie[i].setBounds(0, 50 * i, 400, 50);
-			btn_movie[i].setBorder(new LineBorder(purple, 1));
-			btn_movie[i].setFont(namefont);
-			btn_movie[i].setOpaque(true);
-			btn_movie[i].setBackground(Color.WHITE);
-			btn_movie[i].addActionListener(this);
-			movieListPanel.add(btn_movie[i]);
+		// 영화 좌석 정보
+		StringTokenizer str = new StringTokenizer(seatState, "/");
+		String[] strI = new String[str.countTokens()];
+		int n = 0;
+		while (str.hasMoreElements()) {
+			strI[n] = str.nextToken();
+			n++;
 		}
 
-		JScrollPane sp = new JScrollPane(movieListPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		sp.setBounds(0, 75, 400, 500);
-		sp.setBorder(new LineBorder(purple, 1));
-		moviePanel.add(sp);
-
-		// 지역
-		areaPanel.setBounds(PaddingLeft + 425, PaddingTop, 450, 600);
-		areaPanel.setOpaque(true);
-		areaPanel.setBackground(Color.WHITE);
-		areaPanel.setLayout(null);
-		panel.add(areaPanel);
-
-		titleArea.setBounds(5, 5, 60, 40);
-		titleArea.setFont(font1);
-		titleArea.setHorizontalAlignment(JLabel.CENTER);
-		areaPanel.add(titleArea);
-
-		iconArea.setIcon(imgArea);
-		iconArea.setBounds(67, 0, 50, 50);
-		iconArea.setOpaque(true);
-		iconArea.setBackground(Color.WHITE);
-		areaPanel.add(iconArea);
-
-		// 서울
-		SEOUL.setBounds(0, 75, 225, 40);
-		SEOUL.setOpaque(true);
-		SEOUL.setBackground(purple);
-		SEOUL.setBorder(new LineBorder(purple, 1));
-		SEOUL.setForeground(Color.WHITE);
-		SEOUL.setFont(font1);
-		SEOUL.addActionListener(new Reservation_area_Event());
-		areaPanel.add(SEOUL);
-
-		// 경기
-		GYEONGGI.setBounds(225, 75, 225, 40);
-		GYEONGGI.setOpaque(true);
-		GYEONGGI.setBackground(Color.WHITE);
-		GYEONGGI.setBorder(new LineBorder(purple, 1));
-		GYEONGGI.setFont(font1);
-		GYEONGGI.addActionListener(new Reservation_area_Event());
-		areaPanel.add(GYEONGGI);
-
-		// 서울 지역
-		for (int i = 0; i < seoulArea.length; i++) {
-			// btn_seoullist[i] = new JButton(theater[i].getCountry());
-			seoulArea[i] = new JKeyButton();
-			seoulArea[i].setTheaterKey(theater[i].get_key());// theater_key
-			seoulArea[i].setText(theater[i].getCountry());
-			seoulArea[i].setBounds(10, 150 + (i * 60), 100, 40);
-			seoulArea[i].setFocusPainted(false);
-			seoulArea[i].setBorderPainted(false);
-			seoulArea[i].setOpaque(true);
-			seoulArea[i].setBackground(Color.WHITE);
-			seoulArea[i].setFont(font2);
-			seoulArea[i].addActionListener(new Reservation_country_Event());
-			areaPanel.add(seoulArea[i]);
-		}
-
-		// 경기 지역
-		theater = theater_connect.getTheater("경기");
-		for (int i = 0; i < gyeonggiArea.length; i++) {
-			gyeonggiArea[i] = new JKeyButton();
-			gyeonggiArea[i].setTheaterKey(theater[i].get_key());// theater_key
-			gyeonggiArea[i].setText(theater[i].getCountry());
-			theater[i].get_key();
-			gyeonggiArea[i].setVisible(false);
-			gyeonggiArea[i].setBounds(10, 150 + (i * 60), 100, 40);
-			gyeonggiArea[i].setFocusPainted(false);
-			gyeonggiArea[i].setBorderPainted(false);
-			gyeonggiArea[i].setOpaque(true);
-			gyeonggiArea[i].setBackground(Color.WHITE);
-			gyeonggiArea[i].setFont(font2);
-			gyeonggiArea[i].addActionListener(new Reservation_country_Event());
-			areaPanel.add(gyeonggiArea[i]);
-		}
-
-		// 시간표
-		timePanel.setBounds(PaddingLeft + 900, PaddingTop, 550, 600);
-		timePanel.setOpaque(true);
-		timePanel.setBackground(Color.WHITE);
-		timePanel.setLayout(null);
-		panel.add(timePanel);
-
-		// 날짜, 요일 마우스 위로 가져다 대면 연도 출력
-		for (int i = 0; i < yearMonthTable.length; i++) {
-			yearMonthTable[i] = new JLabel("XXXX년" + "XX월");
-			yearMonthTable[i].setBounds(0 + (i * (500 / 7)), 0, 125, 50);
-			yearMonthTable[i].setVisible(false);
-			yearMonthTable[i].setOpaque(true);
-			yearMonthTable[i].setFont(namefont);
-			yearMonthTable[i].setHorizontalAlignment(JLabel.CENTER);
-			yearMonthTable[i].setForeground(Color.WHITE);
-			yearMonthTable[i].setBackground(purple);
-			timePanel.add(yearMonthTable[i]);
-		}
-
-		// 날짜
-		for (int i = 0; i < dayAndDayofTable.length; i++) {
-			switch (dayofweek) {
-			case 1:
-				weeksName = "일";
-				break;
-			case 2:
-				weeksName = "월";
-				break;
-			case 3:
-				weeksName = "화";
-				break;
-			case 4:
-				weeksName = "수";
-				break;
-			case 5:
-				weeksName = "목";
-				break;
-			case 6:
-				weeksName = "금";
-				break;
-			case 7:
-				weeksName = "토";
-				break;
-			}
-			dayAndDayofTable[i] = new JKeyButton(day + "*" + weeksName);
-			dayAndDayofTable[i].setYear(year);
-			dayAndDayofTable[i].setMonth(month);
-			dayAndDayofTable[i].setDay(day);
-			dayAndDayofTable[i].setDayofweek(dayofweek);
-			dayAndDayofTable[i].setBounds(0 + (i * (500 / 7)), 50, (500 / 7), (450 / 8));
-			dayAndDayofTable[i].setOpaque(true);
-			dayAndDayofTable[i].setBorder(new LineBorder(purple, 1));
-			dayAndDayofTable[i].setBackground(Color.WHITE);
-			dayAndDayofTable[i].setFont(boldfont);
-			dayAndDayofTable[i].addActionListener(new Movie_day_Event());
-			dayAndDayofTable[i].addMouseListener(new EventAdaptor());
-			timePanel.add(dayAndDayofTable[i]);
-			dayofweek += 1;
-			day += 1;
-			if (day > endDate) {
-				day = 1;
-				month += 1;
-				if (month > 11) {
-					month = 0;
-					year += 1;
+		// 예약된 좌석들 표시
+		for (int i = 0; i < n; i++) {// 9
+			String[] strArray = strI[i].split("");
+			int c = 0;
+			for (String s : strArray) {// 24
+				if (s.equals("1")) {
+					int_selectedSit[i][c] = 1;
 				}
-			}
-			if (dayofweek >= 8) {
-				dayofweek = 1;
+				c += 1;
 			}
 		}
 
-		schedulePanel.setBounds(0, 150, 500, 400);
-		schedulePanel.setBackground(Color.WHITE);
-		schedulePanel.setLayout(null);
-		schedulePanel.setPreferredSize(size);
-
-		noSchedule.setIcon(imgNoSchedule);
-		noSchedule.setBounds(0, 0, 500, 500);
-		noSchedule.setOpaque(true);
-		noSchedule.setVisible(false);
-		noSchedule.setBackground(Color.WHITE);
-		schedulePanel.add(noSchedule);
-
-		TimescrollPanel = new JScrollPane(schedulePanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		TimescrollPanel.setBounds(0, 125, 525, 450);
-		TimescrollPanel.setBorder(new LineBorder(purple, 1));
-		timePanel.add(TimescrollPanel);
-
-		// 영화 시간표
-		for (int i = 0; i < 4; i++) {
-			content[i] = new JKeyButton();
-			content[i].setOpaque(true);
-			content[i].setBackground(Color.WHITE);
-			content[i].setFont(namefont);
-			content[i].setVisible(false);
-			content[i].addActionListener(new MovieTime_Event());
-			content[i].setBounds(0, 0 + (i * 125), 520, 125);
-			schedulePanel.add(content[i]);
-		}
-
-		// Panel
+		// panel
 		panel.setBackground(Color.WHITE);
 		panel.setBounds(0, (int) (Main.SCREEN_HEIGHT * 0.25), Main.SCREEN_WIDTH, (int) (Main.SCREEN_HEIGHT * 0.75));
 		panel.setLayout(null);
 		add(panel);
 
-	}
+		screen.setBounds(PaddingLeft + 100, PaddingTop - 75, 1000, 40);
+		screen.setOpaque(true);
+		screen.setBackground(Color.LIGHT_GRAY);
+		screen.setFont(people);
+		screen.setHorizontalAlignment(JLabel.CENTER);
+		panel.add(screen);
 
-	// 지역버튼
-	class Reservation_area_Event implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (e.getSource() == SEOUL) {
-				for (int i = 0; i < seoulArea.length; i++) {
-					SEOUL.setBackground(new Color(82, 12, 139));
-					SEOUL.setForeground(Color.WHITE);
-					GYEONGGI.setOpaque(true);
-					GYEONGGI.setBackground(Color.WHITE);
-					GYEONGGI.setForeground(Color.BLACK);
-					seoulArea[i].setVisible(true);
-					gyeonggiArea[i].setVisible(false);
-					gyeonggiArea[i].setBackground(Color.WHITE);
-					gyeonggiArea[i].setForeground(Color.BLACK);
-					areaKey = "서울";
-				}
-			} else if (e.getSource() == GYEONGGI) {
-				for (int i = 0; i < gyeonggiArea.length; i++) {
-					GYEONGGI.setBackground(new Color(82, 12, 139));
-					GYEONGGI.setForeground(Color.WHITE);
-					SEOUL.setOpaque(true);
-					SEOUL.setBackground(Color.WHITE);
-					SEOUL.setForeground(Color.BLACK);
-					seoulArea[i].setVisible(false);
-					gyeonggiArea[i].setVisible(true);
-					seoulArea[i].setBackground(Color.WHITE);
-					seoulArea[i].setForeground(Color.BLACK);
-					areaKey = "경기";
-				}
-			}
+		// 가로
+		for (int i = 0; i < row.length; i++) {
+			row[i] = new JLabel((i + 1) + "");
 
-		}
-	}
-
-	// 영화 날짜 버튼
-	class Movie_day_Event implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-
-			for (int i = 0; i < dayAndDayofTable.length; i++) {
-				dayAndDayofTable[i].setBackground(Color.WHITE);
-				dayAndDayofTable[i].setForeground(Color.BLACK);
-				if (e.getSource() == dayAndDayofTable[i]) {
-					dayAndDayofTable[i].setBackground(purple);
-					dayAndDayofTable[i].setForeground(Color.WHITE);
-					checkYear = dayAndDayofTable[i].getYear();
-					checkMonth = dayAndDayofTable[i].getMonth();
-					checkDay = dayAndDayofTable[i].getDay();
-					checkDayofweek = dayAndDayofTable[i].getDayofweek();
-				}
-			}
-
-			// 조건에 맞는 영화 데이터 가져오기
-			movieAreas = moviearea_connect.getMovieArea(movieKey, theaterKey, checkDayofweek % 7);// 키에 따른 정보 가져오기
-			// System.out.println("영화 키: "+movieKey+" 극장정보: "+theaterKey+" 선택된 날짜:
-			// "+checkDayofweek%4+" 날짜:"+checkDay+" 요일:"+checkDayofweek);
-
-			// 초기화
-			for (int i = 0; i < 4; i++) {
-				content[i].setEnabled(true);
-				content[i].setVisible(false);
-				content[i].setBackground(Color.WHITE);
-			}
-
-			String escape1 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-			String escape2 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-			// 상영되는 영화 수 많큼
-			for (int i = 0; i < movieAreas.size(); i++) {
-				content[i].setVisible(true);
-				content[i].setText("<html>시작시간 : " + movieAreas.get(i).getStartTime() + "<br>제목 : " + movieName
-						+ escape1 + movieAreas.get(i).getHall() + escape2 + "남은 자리 :"
-						+ movieAreas.get(i).getVacantSeat() + "/" + "216</html>");
-				content[i].setBackground(Color.WHITE);
-				content[i].setHorizontalAlignment(JButton.LEFT);
-				content[i].setBorder(new LineBorder(purple, 1));
-				content[i].setMovieKey(i);// moviearea의 key
-				content[i].setVisible(true);
-
-			}
-
-		}
-
-	}
-
-	// 영화 시간표 버튼
-	class MovieTime_Event implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (user.getUserID() != null) {
-				// TODO Auto-generated method stub
-				JKeyButton btn = (JKeyButton) e.getSource();
-				new MovieSitPage(user, movieAreas.get(btn.getMovieKey()));// 유저 정보와 영화 정보들 넘기기
-				dispose();
+			if (i < 4) {
+				row[i].setBounds(PaddingLeft + (i * 42), PaddingTop + 455, 40, 40);
+			} else if (i < 20) {
+				row[i].setBounds(PaddingLeft + 100 + (i * 42), PaddingTop + 455, 40, 40);
 			} else {
-				JOptionPane message = new JOptionPane();// 메시지 박스 객체
-				message.showMessageDialog(null, "로그인해주세요");
-				new DOKPage(user);
-				dispose();
+				row[i].setBounds(PaddingLeft + 200 + (i * 42), PaddingTop + 455, 40, 40);
 			}
 
+			row[i].setFont(sit_font);
+			row[i].setHorizontalAlignment(JLabel.CENTER);
+			panel.add(row[i]);
 		}
+
+		column[0] = new JLabel("A");
+		column[1] = new JLabel("B");
+		column[2] = new JLabel("C");
+		column[3] = new JLabel("D");
+		column[4] = new JLabel("E");
+		column[5] = new JLabel("F");
+		column[6] = new JLabel("G");
+		column[7] = new JLabel("H");
+		column[8] = new JLabel("I");
+
+		// 세로
+		for (int i = 0; i < column.length; i++) {
+			column[i].setBounds(PaddingLeft - 50, PaddingTop + (i * 50), 40, 40);
+			column[i].setFont(sit_font);
+			column[i].setHorizontalAlignment(JLabel.CENTER);
+			panel.add(column[i]);
+		}
+
+		// 좌석
+		for (int i = 0; i < sit.length; i++) {
+			for (int j = 0; j < sit[i].length; j++) {
+				sit[i][j] = new JButton();
+
+				if (j < 4) {
+					sit[i][j].setBounds(PaddingLeft + (j * 42), PaddingTop + (i * 50), 40, 40);
+				} else if (j < 20) {
+					sit[i][j].setBounds(PaddingLeft + 100 + (j * 42), PaddingTop + (i * 50), 40, 40);
+				} else {
+					sit[i][j].setBounds(PaddingLeft + 200 + (j * 42), PaddingTop + (i * 50), 40, 40);
+				}
+
+				if (int_selectedSit[i][j] == 1) {// 예약된 좌석은 검은색
+					sit[i][j].setBackground(Color.BLACK);
+					sit[i][j].setEnabled(false);
+				} else {
+					sit[i][j].setBackground(Color.LIGHT_GRAY);
+					sit[i][j].addActionListener(new BtnEvent());
+				}
+
+				panel.add(sit[i][j]);
+			}
+		}
+
+		adult.setBounds(PaddingLeft + 25, PaddingTop + 525, 60, 40);
+		adult.setFont(people);
+		adult.setHorizontalAlignment(JLabel.CENTER);
+		panel.add(adult);
+
+		comboboxAdult.setBounds(PaddingLeft + 100, PaddingTop + 525, 150, 30);
+		comboboxAdult.setFont(sit_font);
+		panel.add(comboboxAdult);
+
+		teen.setBounds(PaddingLeft + 275, PaddingTop + 525, 150, 40);
+		teen.setFont(people);
+		teen.setHorizontalAlignment(JLabel.CENTER);
+		panel.add(teen);
+
+		comboboxTeen.setBounds(PaddingLeft + 400, PaddingTop + 525, 150, 30);
+		comboboxTeen.setFont(sit_font);
+		panel.add(comboboxTeen);
+
+		kids.setBounds(PaddingLeft + 560, PaddingTop + 525, 150, 40);
+		kids.setFont(people);
+		kids.setHorizontalAlignment(JLabel.CENTER);
+		panel.add(kids);
+
+		comboboxKids.setBounds(PaddingLeft + 700, PaddingTop + 525, 150, 30);
+		comboboxKids.setFont(sit_font);
+		panel.add(comboboxKids);
+
+		next.setBounds(PaddingLeft + 1100, PaddingTop + 525, 150, 50);
+		next.setIcon(imgNext);
+		next.setBorderPainted(false);
+		next.addActionListener(new BtnEvent());
+		panel.add(next);
 
 	}
 
-	// area 버튼
-	class Reservation_country_Event implements ActionListener {
+	class BtnEvent implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			num_adult = comboboxAdult.getSelectedIndex();
+			num_teen = comboboxTeen.getSelectedIndex();
+			num_kids = comboboxKids.getSelectedIndex();
+			count = num_adult + num_teen + num_kids;
 
-			JKeyButton btn = (JKeyButton) e.getSource();
-			countryKey = btn.getText();
-			theaterKey = btn.getTheaterKey();
+			seatState = "";// 초기화
+			for (int i = 0; i < sit.length; i++) {
+				for (int j = 0; j < sit[i].length; j++) {
+					if (e.getSource() == sit[i][j] && (sit[i][j].getBackground() == gray.getBackground())) {
+						// System.out.println("통과");
+						if (num_adult == 0 && num_teen == 0 && num_kids == 0) {
+							JOptionPane.showMessageDialog(null, "인원을 선택해주세요");
+						} else {
+							if (count <= selectCount) {
+								JOptionPane.showMessageDialog(null, "더 이상 선택하실 수 없습니다.");
+							} else {
+								sit[i][j].setBackground(new Color(82, 12, 139));
+								int_selectedSit[i][j] = 1;
 
-			for (int i = 0; i < 4; i++) {
-				content[i].setVisible(false);
-				content[i].setBackground(Color.WHITE);
+								switch (i) {
+								case 0:
+									select = "A" + (j + 1);
+									break;
+								case 1:
+									select = "B" + (j + 1);
+									break;
+								case 2:
+									select = "C" + (j + 1);
+									break;
+								case 3:
+									select = "D" + (j + 1);
+									break;
+								case 4:
+									select = "E" + (j + 1);
+									break;
+								case 5:
+									select = "F" + (j + 1);
+									break;
+								case 6:
+									select = "G" + (j + 1);
+									break;
+								case 7:
+									select = "H" + (j + 1);
+									break;
+								case 8:
+									select = "I" + (j + 1);
+									break;
+								}
+								seatName.add(select);
+								selectCount++;
+							}
+
+						}
+					} else if (e.getSource() == sit[i][j]) {
+						int_selectedSit[i][j] = 0;
+						selectCount -= 1;
+						seatName.remove(selectCount);
+						sit[i][j].setBackground(Color.LIGHT_GRAY);
+					}
+					seatState += int_selectedSit[i][j];
+				}
+				seatState += '/';
 			}
 
-			// 서울
-			for (int i = 0; i < seoulArea.length; i++) {
-				seoulArea[i].setBackground(Color.WHITE);
-				seoulArea[i].setForeground(Color.BLACK);
-				noSchedule.setVisible(false);
-				if (e.getSource() == seoulArea[i]) {
-					seoulArea[i].setBackground(new Color(82, 12, 139));
-					seoulArea[i].setForeground(Color.WHITE);
+			// 다음
+			if (e.getSource() == next) {
+
+				if (num_adult == 0 && num_teen == 0 && num_kids == 0) {
+					JOptionPane.showMessageDialog(null, "인원을 선택해주세요");
+				} else {
+					ticket.setSeatCount(selectCount);
+					movieArea.setSeatState(seatState);
+					// 예약된 좌석들
+					new ReservationCheckPage(user, num_adult, num_teen, num_kids, seatName, ticket, movieArea);
+					dispose();
 				}
 			}
 
-			// 경기도
-			for (int i = 0; i < gyeonggiArea.length; i++) {
-				gyeonggiArea[i].setBackground(Color.WHITE);
-				gyeonggiArea[i].setForeground(Color.BLACK);
-				noSchedule.setVisible(false);
-				if (e.getSource() == gyeonggiArea[i]) {
-					gyeonggiArea[i].setBackground(new Color(82, 12, 139));
-					gyeonggiArea[i].setForeground(Color.WHITE);
-					if (e.getSource() == gyeonggiArea[2])
-						noSchedule.setVisible(true);
-
-				}
-			}
-
-		}
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		JKeyButton m = (JKeyButton) e.getSource();
-		movieName = m.getText();
-		movieKey = m.getMovieKey();// 영화 프라이머리_key가져오기
-
-		for (int i = 0; i < movieNum; i++) {
-			btn_movie[i].setBackground(Color.WHITE);
-			btn_movie[i].setForeground(Color.BLACK);
-			if (m == btn_movie[i]) {
-				btn_movie[i].setBackground(new Color(82, 12, 139));
-				btn_movie[i].setForeground(Color.WHITE);
-			}
-		}
-	}
-
-	class EventAdaptor extends MouseAdapter {
-		@Override // 마우스가 들어가면
-		public void mouseEntered(MouseEvent e) {
-			for (int i = 0; i < dayAndDayofTable.length; i++) {
-				if (e.getSource() == dayAndDayofTable[i]) {
-					yearMonthTable[i].setVisible(true);
-					int year = dayAndDayofTable[i].getYear();
-					int month = dayAndDayofTable[i].getMonth();
-					yearMonthTable[i].setText(year + "년  " + (month + 1) + "월");
-				}
-			}
-		}
-
-		@Override // 마우스가 나가지면
-		public void mouseExited(MouseEvent e) {
-			for (int i = 0; i < dayAndDayofTable.length; i++) {
-				if (e.getSource() == dayAndDayofTable[i]) {
-					yearMonthTable[i].setVisible(false);
-					break;
-				}
-			}
 		}
 	}
 
 	@Override
 	public void run() {
-		String str = null;
-		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd HH:mm");
-		while (true) {// 무한반복	
-			// 오늘 날짜,시간,분 을 구함
-			Date currentDate = new Date();
-			//System.out.println("지금"+currentDate);
+		while (true) {
+
+			// MovieArea 데이터 계속 받아오기
+			MovieArea movieAreaE = connect_movieArea.getMovieArea(movieArea.get_key());
+			seatState = movieAreaE.getSeatState();
 			try {
-				for (int i = 0; i < movieAreas.size(); i++) {
-					str = checkYear+"-"+(checkMonth+1)+"-"+checkDay+" "+movieAreas.get(i).getStartTime();//1월이 0부터 시작
-					//System.out.println(str);
-					Date movieDate = sdf.parse(str);
-					//System.out.println("영화"+i+":"+movieDate);
-					if(movieDate.compareTo(currentDate)<0) {//상영영화가 현재 시간보다 작으면
-						//System.out.println("상영불가능");
-						content[i].setEnabled(false);
+				Thread.sleep(1000);
+				// 영화 좌석 정보
+				StringTokenizer str = new StringTokenizer(seatState, "/");
+				String[] strI = new String[str.countTokens()];
+				int n = 0;
+				// 한줄씩 배열에 넣기 (9)
+				while (str.hasMoreElements()) {
+					strI[n] = str.nextToken();
+					n++;
+				}
+
+				// 예약된 좌석들 표시
+				for (int i = 0; i < n; i++) {// 9
+					String[] strArray = strI[i].split("");
+					int c = 0;
+					for (String s : strArray) {// 24
+						if (s.equals("1")) {
+							int_selectedSit[i][c] = 1;
+						}
+						c += 1;
 					}
-				}	
-				//Thread.sleep(1000);
-				
+				}
+
+				// 좌석
+				for (int i = 0; i < sit.length; i++) {
+					for (int j = 0; j < sit[i].length; j++) {
+
+						if (int_selectedSit[i][j] == 1) {// 예약된 좌석은 검은색
+							sit[i][j].setBackground(Color.BLACK);
+							sit[i][j].setEnabled(false);
+							
+						} else {
+							sit[i][j].setBackground(Color.LIGHT_GRAY);
+						}
+
+					}
+
+				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				e.printStackTrace();
 			}
 		}
-		// 현재 날짜와 비교
-	}
 
-}
-
-class JKeyButton extends JButton {
-
-	private int theaterKey;
-	private int movieKey;
-
-	private int year;
-	private int month;
-	private int day;
-	private int dayofweek;
-
-	public JKeyButton() {
-
-	}
-
-	public JKeyButton(String str) {
-		super(str);
-	}
-
-	public int getMovieKey() {
-		return movieKey;
-	}
-
-	public void setMovieKey(int movieKey) {
-		this.movieKey = movieKey;
-	}
-
-	public int getTheaterKey() {
-		return theaterKey;
-	}
-
-	public void setTheaterKey(int theaterKey) {
-		this.theaterKey = theaterKey;
-	}
-
-	public int getYear() {
-		return year;
-	}
-
-	public void setYear(int year) {
-		this.year = year;
-	}
-
-	public int getMonth() {
-		return month;
-	}
-
-	public void setMonth(int month) {
-		this.month = month;
-	}
-
-	public int getDay() {
-		return day;
-	}
-
-	public void setDay(int day) {
-		this.day = day;
-	}
-
-	public int getDayofweek() {
-		return dayofweek;
-	}
-
-	public void setDayofweek(int dayofweek) {
-		this.dayofweek = dayofweek;
 	}
 
 }

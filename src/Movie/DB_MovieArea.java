@@ -92,6 +92,41 @@ public class DB_MovieArea {
 		return movieAreas;
 	}
 
+	
+	public MovieArea getMovieArea(int _key) {
+		try {
+			movieAreas.clear();
+			String SQL = "select* from moviearea where _key like " + _key + ";";
+			// System.out.println(SQL);
+			rs = st.executeQuery(SQL);
+
+			while (rs.next()) {
+				movieArea = new MovieArea();
+				movieArea.set_key(rs.getInt("_key"));
+				movieArea.setArea_key(rs.getInt("area_key"));
+				movieArea.setHall(rs.getString("hall"));
+				movieArea.setWeeks(rs.getInt("weeks"));
+				movieArea.setMovieKey(rs.getInt("movieKey"));
+				movieArea.setVacantSeat(rs.getInt("vacantSeat"));
+				movieArea.setStartTime(rs.getString("startTime"));
+				movieArea.setSeatState(rs.getString("seatState"));
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("DBMovieInfo데이터베이스 검색 오류:" + e.getLocalizedMessage());
+		}finally {
+			try {
+				if(rs!=null) {rs.close();}
+				//if(st!=null) {st.close();}
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		return movieArea;
+	}
+	
 	public Vector<MovieArea> getMovieArea(int movie_key, int theater_key, int weeks) {
 		try {
 			movieAreas.clear();
@@ -126,7 +161,6 @@ public class DB_MovieArea {
 		}
 		return movieAreas;
 
-		
 
 	}
 
