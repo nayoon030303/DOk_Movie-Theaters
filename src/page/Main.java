@@ -9,6 +9,7 @@ public class Main {
 	
 	static User user = new User();
 	
+	
 	public static void main(String[] args) {
 		
 		new DOKPage(user);
