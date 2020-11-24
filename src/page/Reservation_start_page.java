@@ -424,6 +424,13 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 
+			isReset = false;
+			try {
+				Thread.sleep(50);
+			}catch (Exception exc) {
+				// TODO: handle exception
+			}
+			
 			for (int i = 0; i < dayAndDayofTable.length; i++) {
 				dayAndDayofTable[i].setBackground(Color.WHITE);
 				dayAndDayofTable[i].setForeground(Color.BLACK);
@@ -439,7 +446,6 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 			}			
 			// 초기화
 			reset();
-			System.out.println("리셋됨");
 		}
 
 	}
