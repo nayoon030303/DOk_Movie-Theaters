@@ -459,7 +459,9 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 			if (user.getUserID() != null) {
 				for (int i = 0; i < content.length; i++) {
 					if (e.getSource() == content[i]) {
-						new MovieSitPage(user, content[i].getMovieArea());// 유저 정보와 영화 정보들 넘기기
+						Thread t1 = new Thread(new MovieSitPage(user, content[i].getMovieArea()));
+						t1.start();
+						//new MovieSitPage(user, content[i].getMovieArea());// 유저 정보와 영화 정보들 넘기기
 						dispose();
 					}
 
@@ -586,6 +588,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 						c++;
 					}										
 					reset();
+					isNextDay = false;
 				}
 				movieAreaContent();
 

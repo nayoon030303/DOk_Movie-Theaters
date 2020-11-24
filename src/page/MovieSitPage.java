@@ -1,6 +1,5 @@
 package page;
 
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -27,6 +26,10 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	private final static int PaddingLeft = 150;
 	private final static int PaddingTop = 125;
 
+	private final static int NO_SELECT = 0;
+	private final static int PRE_SELECT = 1;
+	private final static int NOW_SELECT = 2;
+	
 	// component
 	private JPanel panel = new JPanel();
 	private JLabel screen = new JLabel("SCREEN");
@@ -101,7 +104,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 			int c = 0;
 			for (String s : strArray) {// 24
 				if (s.equals("1")) {
-					int_selectedSit[i][c] = 1;
+					int_selectedSit[i][c] = PRE_SELECT;
 				}
 				c += 1;
 			}
@@ -234,7 +237,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 							if (count <= selectCount) {
 								JOptionPane.showMessageDialog(null, "더 이상 선택하실 수 없습니다.");
 							} else {
-								sit[i][j].setBackground(new Color(82, 12, 139));
+								sit[i][j].setBackground(new Color(82, 12, 139));//보라색
 								int_selectedSit[i][j] = 1;
 
 								switch (i) {
@@ -272,7 +275,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 
 						}
 					} else if (e.getSource() == sit[i][j]) {
-						int_selectedSit[i][j] = 0;
+						int_selectedSit[i][j] = NO_SELECT;
 						selectCount -= 1;
 						seatName.remove(selectCount);
 						sit[i][j].setBackground(Color.LIGHT_GRAY);
@@ -291,7 +294,10 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 					ticket.setSeatCount(selectCount);
 					movieArea.setSeatState(seatState);
 					// 예약된 좌석들
-					new ReservationCheckPage(user, num_adult, num_teen, num_kids, seatName, ticket, movieArea);
+					Thread t1 = new Thread(
+							new ReservationCheckPage(user, num_adult, num_teen, num_kids, seatName, ticket, movieArea));
+					// new ReservationCheckPage(user, num_adult, num_teen, num_kids, seatName,
+					// ticket, movieArea);
 					dispose();
 				}
 			}
@@ -308,48 +314,12 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 			seatState = movieAreaE.getSeatState();
 			try {
 				Thread.sleep(1000);
-				// 영화 좌석 정보
-				StringTokenizer str = new StringTokenizer(seatState, "/");
-				String[] strI = new String[str.countTokens()];
-				int n = 0;
-				// 한줄씩 배열에 넣기 (9)
-				while (str.hasMoreElements()) {
-					strI[n] = str.nextToken();
-					n++;
-				}
-
-				// 예약된 좌석들 표시
-				for (int i = 0; i < n; i++) {// 9
-					String[] strArray = strI[i].split("");
-					int c = 0;
-					for (String s : strArray) {// 24
-						if (s.equals("1")) {
-							int_selectedSit[i][c] = 1;
-						}
-						c += 1;
-					}
-				}
-
-				// 좌석
-				for (int i = 0; i < sit.length; i++) {
-					for (int j = 0; j < sit[i].length; j++) {
-
-						if (int_selectedSit[i][j] == 1) {// 예약된 좌석은 검은색
-							sit[i][j].setBackground(Color.BLACK);
-							sit[i][j].setEnabled(false);
-							
-						} else {
-							sit[i][j].setBackground(Color.LIGHT_GRAY);
-						}
-
-					}
-
-				}
+				//만약 지금 seatState와 db의 seatState가 다르다면 
+				
 			} catch (Exception e) {
-				// TODO: handle exception
+				e.printStackTrace();
 			}
 		}
 
 	}
-
 }

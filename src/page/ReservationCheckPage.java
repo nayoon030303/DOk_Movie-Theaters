@@ -21,7 +21,7 @@ import User.User;
 import page.CategoryFrame.windowAdapter;
 import ticket.Ticket;
 
-public class ReservationCheckPage extends JFrame implements ActionListener {
+public class ReservationCheckPage extends JFrame implements ActionListener, Runnable {
 	private final static int PaddingLeft = 50;
 	private final static int PaddingTop = 175;
 	private final static int PRICE_Y = 50;
@@ -145,7 +145,8 @@ public class ReservationCheckPage extends JFrame implements ActionListener {
 		if(e.getSource() == sure) {
 			ticket.setPrice(resultPrice);
 			ticket.setSeatWhere(sit.getText());
-			new PayPage(user,ticket, movieArea);
+			Thread t1 = new Thread(new PayPage(user,ticket, movieArea));
+			//new PayPage(user,ticket, movieArea);
 			dispose();
 		}
 	}
@@ -159,5 +160,10 @@ public class ReservationCheckPage extends JFrame implements ActionListener {
 	     	   new DOKPage(user);
 	        }
 		}  
+	}
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 }

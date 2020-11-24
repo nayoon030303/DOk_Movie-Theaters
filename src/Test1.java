@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 import Movie.DB_MovieArea;
 import Movie.MovieArea;
@@ -16,9 +17,11 @@ public class Test1 {
 	public static void main(String[] args) {
 		DB_MovieArea connect = new DB_MovieArea(); 
 		
-		MovieArea movieArea = connect.getMovieArea(224);
+		Test t1 = new Test(user, connect.getMovieArea(224));
+		Thread th = new Thread(t1);
+		th.start();
 		
-		Thread t1 = new Thread(new Test(user, movieArea));
-		t1.start();
+		
 	}
+	
 }
