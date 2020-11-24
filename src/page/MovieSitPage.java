@@ -1,9 +1,11 @@
 package page;
 
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -29,12 +31,15 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	private final static int NO_SELECT = 0;
 	private final static int PRE_SELECT = 1;
 	private final static int NOW_SELECT = 2;
-	
+
 	// component
 	private JPanel panel = new JPanel();
 	private JLabel screen = new JLabel("SCREEN");
-	private JButton[][] sit = new JButton[9][24];
+
+	// 좌석
+	public static JButton[][] sit = new JButton[9][24];
 	private int[][] int_selectedSit = new int[9][24];// 선택된 자석들 1
+
 	private JButton gray = new JButton(); // gray색 버튼
 	private String[] str_number = { "0", "1", "2", "3", "4", "5", "6", "7", "8" };
 	private JLabel adult = new JLabel("성인");
@@ -58,7 +63,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	private String select = "";
 	private int count = 0;
 	private int selectCount = 0;
-
+	private boolean isCountStart = false;
 	private MovieArea movieArea;
 	private Ticket ticket = new Ticket();
 	private String seatState;
@@ -70,7 +75,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	// DB
 	private DB_MovieArea connect_movieArea = new DB_MovieArea();
 
-	public MovieSitPage(User user, MovieArea movieArea) {
+	public MovieSitPage(User user, MovieArea pre_movieArea) {
 		super("영화 좌석 선택");
 		setSize(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
 		setResizable(false);
@@ -78,9 +83,11 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 		getContentPane().setLayout(null); // 레이아웃 null
 		setVisible(true);
 
+		startRunMovieSit = true;
+		
 		// 정보 연결
 		this.user = user;
-		this.movieArea = movieArea;
+		this.movieArea = connect_movieArea.getMovieArea(pre_movieArea.get_key());
 		seatState = movieArea.getSeatState();
 
 		// ticket에 정보 set
@@ -89,27 +96,10 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 
 		gray.setBackground(Color.LIGHT_GRAY);
 
-		// 영화 좌석 정보
-		StringTokenizer str = new StringTokenizer(seatState, "/");
-		String[] strI = new String[str.countTokens()];
-		int n = 0;
-		while (str.hasMoreElements()) {
-			strI[n] = str.nextToken();
-			n++;
-		}
-
-		// 예약된 좌석들 표시
-		for (int i = 0; i < n; i++) {// 9
-			String[] strArray = strI[i].split("");
-			int c = 0;
-			for (String s : strArray) {// 24
-				if (s.equals("1")) {
-					int_selectedSit[i][c] = PRE_SELECT;
-				}
-				c += 1;
-			}
-		}
-
+		// 영화 좌석 정보	 예매1 비어있는자리 0	
+		int_selectedSit = setReservationSeat(seatState, int_selectedSit);
+		
+		
 		// panel
 		panel.setBackground(Color.WHITE);
 		panel.setBounds(0, (int) (Main.SCREEN_HEIGHT * 0.25), Main.SCREEN_WIDTH, (int) (Main.SCREEN_HEIGHT * 0.75));
@@ -214,6 +204,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 		next.setIcon(imgNext);
 		next.setBorderPainted(false);
 		next.addActionListener(new BtnEvent());
+		next.setEnabled(false);
 		panel.add(next);
 
 	}
@@ -221,105 +212,172 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	class BtnEvent implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			num_adult = comboboxAdult.getSelectedIndex();
-			num_teen = comboboxTeen.getSelectedIndex();
-			num_kids = comboboxKids.getSelectedIndex();
-			count = num_adult + num_teen + num_kids;
-
 			seatState = "";// 초기화
 			for (int i = 0; i < sit.length; i++) {
 				for (int j = 0; j < sit[i].length; j++) {
-					if (e.getSource() == sit[i][j] && (sit[i][j].getBackground() == gray.getBackground())) {
+					if (e.getSource() == sit[i][j] && (sit[i][j].getBackground() == gray.getBackground())) {// 회색좌석을
+						// System.out.println(isCountStart);
 						// System.out.println("통과");
-						if (num_adult == 0 && num_teen == 0 && num_kids == 0) {
+						if (num_adult == 0 && num_teen == 0 && num_kids == 0) {// 숫자를 선택하지 않았을 때
 							JOptionPane.showMessageDialog(null, "인원을 선택해주세요");
+						} else if (count <= selectCount) {// 좌석수가 넘어갈 떄
+							JOptionPane.showMessageDialog(null, "더 이상 선택하실 수 없습니다.");
 						} else {
-							if (count <= selectCount) {
-								JOptionPane.showMessageDialog(null, "더 이상 선택하실 수 없습니다.");
-							} else {
-								sit[i][j].setBackground(new Color(82, 12, 139));//보라색
-								int_selectedSit[i][j] = 1;
+							sit[i][j].setBackground(new Color(82, 12, 139));// 보라색
+							int_selectedSit[i][j] = NOW_SELECT;
 
-								switch (i) {
-								case 0:
-									select = "A" + (j + 1);
-									break;
-								case 1:
-									select = "B" + (j + 1);
-									break;
-								case 2:
-									select = "C" + (j + 1);
-									break;
-								case 3:
-									select = "D" + (j + 1);
-									break;
-								case 4:
-									select = "E" + (j + 1);
-									break;
-								case 5:
-									select = "F" + (j + 1);
-									break;
-								case 6:
-									select = "G" + (j + 1);
-									break;
-								case 7:
-									select = "H" + (j + 1);
-									break;
-								case 8:
-									select = "I" + (j + 1);
-									break;
-								}
-								seatName.add(select);
-								selectCount++;
+							switch (i) {
+							case 0:
+								select = "A" + (j + 1);
+								break;
+							case 1:
+								select = "B" + (j + 1);
+								break;
+							case 2:
+								select = "C" + (j + 1);
+								break;
+							case 3:
+								select = "D" + (j + 1);
+								break;
+							case 4:
+								select = "E" + (j + 1);
+								break;
+							case 5:
+								select = "F" + (j + 1);
+								break;
+							case 6:
+								select = "G" + (j + 1);
+								break;
+							case 7:
+								select = "H" + (j + 1);
+								break;
+							case 8:
+								select = "I" + (j + 1);
+								break;
 							}
+							seatName.add(select);
+							selectCount++;
+
+							/*
+							 * if (selectCount == count) { next.setEnabled(true); }
+							 */
 
 						}
-					} else if (e.getSource() == sit[i][j]) {
-						int_selectedSit[i][j] = NO_SELECT;
+					} else if (e.getSource() == sit[i][j]) {// 보라좌석을 선택
+						int_selectedSit[i][j] = NO_SELECT;// 0
 						selectCount -= 1;
 						seatName.remove(selectCount);
 						sit[i][j].setBackground(Color.LIGHT_GRAY);
+
 					}
 					seatState += int_selectedSit[i][j];
 				}
 				seatState += '/';
 			}
 
-			// 다음
+			// 다음 버튼
 			if (e.getSource() == next) {
-
 				if (num_adult == 0 && num_teen == 0 && num_kids == 0) {
 					JOptionPane.showMessageDialog(null, "인원을 선택해주세요");
 				} else {
-					ticket.setSeatCount(selectCount);
-					movieArea.setSeatState(seatState);
-					// 예약된 좌석들
-					Thread t1 = new Thread(
-							new ReservationCheckPage(user, num_adult, num_teen, num_kids, seatName, ticket, movieArea));
-					// new ReservationCheckPage(user, num_adult, num_teen, num_kids, seatName,
-					// ticket, movieArea);
+					// DB_MovieArea에서 seatState 받기
+					String db_seatState = connect_movieArea.getMovieArea(movieArea.get_key()).getSeatState();
+					int[][] intdb_seatSit = new int[9][24];
+					
+					//영화 좌석 정보	 예매1 비어있는자리 0	
+					intdb_seatSit = setReservationSeat(db_seatState, intdb_seatSit);
+				
+					int c = 0;
+					for (int i = 0; i < 9; i++) {
+						for (int j = 0; j < 24; j++) {
+							if (intdb_seatSit[i][j] == NO_SELECT && int_selectedSit[i][j] == NOW_SELECT) {
+								c++;
+							}
+						}
+					}
+					System.out.println(c);
+					System.out.println(count);
+					// 예매 가능한
+					if (c == count) {
+						seatState = seatState.replace("2", "1");// 2를 1로 치환
+						String[] seat_Name = new String[seatName.size()];
+						for(int i=0; i<seatName.size(); i++) {
+							seat_Name[i] = (String)seatName.get(i);
+						}
+						Arrays.sort(seat_Name);//정렬 오름차순
+						// 정보들 저장
+						
+						ticket.setSeatWhere(Arrays.toString(seat_Name));
+						ticket.setSeatCount(selectCount);
+						movieArea.setSeatState(seatState);
+						Thread t1 = new Thread(new PayPage(user, ticket, movieArea,num_adult,num_teen, num_kids));
+						t1.start();
+						startRunMovieSit = false;
+					
+					} else {
+						JOptionPane.showMessageDialog(null, "이미 선택된 좌석입니다.");
+						MovieSitPage t1 = new MovieSitPage(user, movieArea);
+						Thread th = new Thread(t1);
+						th.start();
+					}
+
 					dispose();
-				}
+				} // 동작 끝
 			}
 
 		}
+
+	}
+	int[][] setReservationSeat(String cutStr,int[][] seeatSit) {
+		StringTokenizer str = new StringTokenizer(cutStr, "/");
+		String[] strI = new String[str.countTokens()];
+		int n = 0;
+		while (str.hasMoreElements()) {
+			strI[n] = str.nextToken();
+			n++;
+		}
+		// 예약된 좌석들 표시
+		for (int i = 0; i < 9; i++) {// 9
+			String[] strArray = strI[i].split("");
+			int c = 0;
+			for (String s : strArray) {// 24
+				if (s.equals("1")) {
+					seeatSit[i][c] = PRE_SELECT;
+				} else if (s.equals("0")) {
+					seeatSit[i][c] = NO_SELECT;
+				}
+				c += 1;
+			}
+		}
+		return seeatSit;
 	}
 
 	@Override
 	public void run() {
+		System.out.println("run2시작");
 		while (true) {
+			//System.out.println("r2");
+			if(startRunMovieSit) {
+				num_adult = comboboxAdult.getSelectedIndex();
+				num_teen = comboboxTeen.getSelectedIndex();
+				num_kids = comboboxKids.getSelectedIndex();
+				count = num_adult + num_teen + num_kids;
+				if (selectCount == count && count != 0) {
+					next.setEnabled(true);
+				} else if (selectCount < count) {
+					next.setEnabled(false);
+				}
 
-			// MovieArea 데이터 계속 받아오기
-			MovieArea movieAreaE = connect_movieArea.getMovieArea(movieArea.get_key());
-			seatState = movieAreaE.getSeatState();
-			try {
-				Thread.sleep(1000);
-				//만약 지금 seatState와 db의 seatState가 다르다면 
-				
-			} catch (Exception e) {
-				e.printStackTrace();
+			}else {
+				break;
 			}
+
 		}
+		
+		
+		
+		
 
 	}
+
 }

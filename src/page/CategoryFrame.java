@@ -48,6 +48,11 @@ public class CategoryFrame extends JFrame {
 	protected Font font2 = new Font("나눔바른고딕", Font.BOLD, 40);
 	protected Font font3 = new Font("Franklin Gothic Heavy", Font.PLAIN, 30);
 
+	//상태
+	public boolean startRunReservation_start = false;
+	public boolean startRunMovieSit = false;
+	
+	
 	// user정보
 	protected User user = new User();
 
@@ -92,7 +97,8 @@ public class CategoryFrame extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
+			startRunReservation_start = false;
+			startRunMovieSit = false;
 			if (e.getSource() == category[0]) {// 홈
 				new DOKPage(user);
 				dispose();
@@ -134,7 +140,7 @@ public class CategoryFrame extends JFrame {
 	}
 
 	// 윈도우 X버튼을 눌렀을때
-	class windowAdapter extends WindowAdapter {
+	public class windowAdapter extends WindowAdapter {
 
 		@Override
 		public void windowClosing(WindowEvent e) {

@@ -1,7 +1,11 @@
 package Movie;
 
 public class Movie {
-
+	
+	public static final int ADULT = 10000;
+	public static final int TEEN = 8000;
+	public static final int KIDS = 5000;
+	
 	private int _key;
 	private String m_name, genre, open_day;
 	private int audience;
@@ -10,8 +14,7 @@ public class Movie {
 	private String country;
 	private int running_time;
 	private String disributor;
-	public Movie() {
-	}
+	public Movie() {}
 
 	public Movie(int _key, String m_name, String genre, String open_day, int audience, double rating) {
 		this._key = _key;

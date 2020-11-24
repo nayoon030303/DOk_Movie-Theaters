@@ -48,6 +48,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	private final static int PaddingLeft = 40;
 	private final static int PaddingTop = 100;
 	private final static double Panel_Height = 700;
+	
 
 	// 날짜
 	private LocalDateTime currentDateTime = LocalDateTime.now();//현재 날짜와 시간
@@ -152,6 +153,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 		setVisible(true);
 		setBackground(Color.WHITE);
 		
+		startRunReservation_start = true;
 		
 		mapDayOfweeks.put("월", 1);
 		mapDayOfweeks.put("화", 2);
@@ -461,7 +463,8 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					if (e.getSource() == content[i]) {
 						Thread t1 = new Thread(new MovieSitPage(user, content[i].getMovieArea()));
 						t1.start();
-						//new MovieSitPage(user, content[i].getMovieArea());// 유저 정보와 영화 정보들 넘기기
+						startRunReservation_start = false;
+						System.out.println("종료");
 						dispose();
 					}
 
@@ -562,40 +565,43 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 
 	@Override
 	public void run() {
-	
 		while (true) {// 무한반복
-			LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
-			//System.out.println(currentDateTime);
-			try {
-				
-				if((currentDateTime.getHour() == 23 && currentDateTime.getMinute() == 59 && currentDateTime.getSecond() == 59) || isNextDay) {
-					Thread.sleep(1000);
-					int c =1;
-					for (int i = 0; i < dayAndDayofTable.length; i++) {					
-						LocalDateTime newDate = currentDateTime.plusDays(c);	
-						System.out.println(newDate);
-						int year = newDate.getYear();//년도
-						int month = newDate.getMonthValue(); // 월
-						int day = newDate.getDayOfMonth();// 날짜
-						String dayofweek = newDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);// 요일
-						
-						dayAndDayofTable[i].setText(day + "*" + dayofweek);
-						dayAndDayofTable[i].setYear(year);
-						dayAndDayofTable[i].setMonth(month);
-						dayAndDayofTable[i].setDay(day);
-						dayAndDayofTable[i].setDayofweek(dayofweek);
-						timePanel.add(dayAndDayofTable[i]);
-						c++;
-					}										
-					reset();
-					isNextDay = false;
+			//System.out.println("r1");
+			if(startRunReservation_start) {
+				LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
+				//System.out.println(currentDateTime);
+				try {
+					
+					if((currentDateTime.getHour() == 23 && currentDateTime.getMinute() == 59 && currentDateTime.getSecond() == 59) || isNextDay) {
+						Thread.sleep(1000);
+						int c =1;
+						for (int i = 0; i < dayAndDayofTable.length; i++) {					
+							LocalDateTime newDate = currentDateTime.plusDays(c);	
+							System.out.println(newDate);
+							int year = newDate.getYear();//년도
+							int month = newDate.getMonthValue(); // 월
+							int day = newDate.getDayOfMonth();// 날짜
+							String dayofweek = newDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);// 요일
+							
+							dayAndDayofTable[i].setText(day + "*" + dayofweek);
+							dayAndDayofTable[i].setYear(year);
+							dayAndDayofTable[i].setMonth(month);
+							dayAndDayofTable[i].setDay(day);
+							dayAndDayofTable[i].setDayofweek(dayofweek);
+							timePanel.add(dayAndDayofTable[i]);
+							c++;
+						}										
+						reset();
+						isNextDay = false;
+					}
+					movieAreaContent();
+
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				movieAreaContent();
-
-			} catch (Exception e) {
-				e.printStackTrace();
+			}else {
+				break;
 			}
-
 		}
 
 	}

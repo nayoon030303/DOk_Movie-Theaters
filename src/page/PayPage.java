@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import Movie.Movie;
 import Movie.MovieArea;
 import User.User;
 import page.CategoryFrame.windowAdapter;
@@ -33,6 +34,8 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 
 	// component
 	private JPanel panel = new JPanel();
+	private JLabel howMuch = new JLabel("최종결제금액 :");
+	private JLabel price = new JLabel();
 	private JLabel choice = new JLabel("결제 방법을 선택해주세요.");
 	private ButtonGroup g = new ButtonGroup();
 	private JRadioButton card = new JRadioButton("신용 카드", true);
@@ -59,17 +62,33 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 	private Ticket ticket;
 	private User user;
 	private MovieArea movieArea;
+	private int num_adult, num_teen, num_kids;
+	private boolean startPayPage = false;
 
 	// 날짜
 	private SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 	// design
 	private Font compo = new Font("나눔바른고딕", Font.BOLD, 20);
-	private Font input = new Font("나눔바른고딕", Font.PLAIN, 12);
+	private Font input = new Font("나눔바른고딕", Font.PLAIN, 15);
 
-	public PayPage(User user, Ticket ticket, MovieArea movieArea) {
+	public PayPage(User user, Ticket ticket, MovieArea movieArea, int num_adult, int num_teen, int num_kids) {
 
 		addWindowListener(new windowAdapter());
+
+		// 최종결제
+		howMuch.setBounds(PaddingLeft, PaddingTop - 115, 275, 50);
+		howMuch.setFont(compo);
+		panel.add(howMuch);
+
+		int moviePrice = num_adult * Movie.ADULT + num_teen * Movie.TEEN + num_kids * Movie.KIDS;
+		System.out.println(moviePrice);
+		price.setBounds(PaddingLeft + 150, PaddingTop - 115, 275, 50);
+		price.setFont(new Font("나눔바른고딕", Font.PLAIN, 20));
+		price.setText(moviePrice + " 원");
+		panel.add(price);
+
+		startPayPage = true;
 
 		// 결제 방법 선택 레이블
 		choice.setBounds(PaddingLeft, PaddingTop, 275, 50);
@@ -80,7 +99,10 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 		this.ticket = ticket;
 		this.user = user;
 		this.movieArea = movieArea;
-
+		this.num_adult = num_adult;
+		this.num_teen = num_teen;
+		this.num_kids = num_kids;
+		
 		// 라디오 그룹으로 묶어서 A or B로 만들기
 		g.add(card);
 		g.add(cash);
@@ -164,6 +186,7 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 		panel.setLayout(null);
 		panel.setBackground(Color.WHITE);
 
+		setTitle("최종결제");
 		setSize(500, 900);
 		setVisible(true);
 		setResizable(false);
@@ -216,10 +239,13 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 			yymmdd = format1.format(System.currentTimeMillis());
 			ticket.setYymmdd(yymmdd);
 			ticket.setPayHow(howPay);
+
 			if ((card.isSelected()
 					&& (inputCardNumber.getText().length() > 1 && inputCardPassword.getText().length() > 1))
 					|| (cash.isSelected() && inputName.getText().length() > 1)) {
-				new PayTimer(user, ticket, movieArea);
+				ticket.setYymmdd(yymmdd);
+				startPayPage = false;
+				new PayTimer(user, movieArea, ticket, num_adult, num_teen, num_kids);// pay타이머
 				dispose();
 			} else {
 				JOptionPane message = new JOptionPane();
@@ -235,6 +261,7 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 		public void windowClosing(WindowEvent e) {
 			int result = JOptionPane.showConfirmDialog(null, "예매를 취소하시겠습니까?");
 			if (result == JOptionPane.OK_OPTION) {
+				startPayPage = false;
 				dispose();
 				new DOKPage(user);
 			}
@@ -243,7 +270,26 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		int second = 0;
+		while (startPayPage) {
+			second += 1;
+			//System.out.println(second);
+			try {
+				if (second > 30) {
+					System.out.println("시간초과");
+					JOptionPane message = new JOptionPane();// 메시지 박스 객체
+					message.showMessageDialog(null, "결제 시간을 초과 햐였습니다. 다시 메인 페이지로 돌아갑니다.");
+					new DOKPage(user);
+					dispose();
+					startPayPage = false;
+
+				}
+
+				Thread.sleep(1000);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 }

@@ -21,26 +21,34 @@ class Timer2 extends Thread{
    private JLabel timerLabel;
    private int n;
    private User user;
+   private MovieArea movieArea;
+   private Ticket ticket;
+   private int num_adult,num_teen, num_kids;
    
-   public Timer2(JFrame frame,JLabel timerLabel, User user) {
+   public Timer2(JFrame frame,JLabel timerLabel, User user, MovieArea movieArea,Ticket ticket, int num_adult, int num_teen, int num_kids) {
       this.frame = frame;
       this.timerLabel = timerLabel;
       this.user = user;
+      this.movieArea = movieArea;
+      this.ticket = ticket;
+      this.num_adult = num_adult;
+      this.num_teen = num_teen;
+      this.num_kids = num_kids;
    }
    
    @Override
    public void run() {
       // TODO Auto-generated method stub
       n=5; 
-      while(true) {
+      while(!this.isInterrupted()) {
          n--;
          try {
             if(n<0) {
                System.out.println("완료");
                frame.dispose();
                
-               new DOKPage(user);
-               stop();
+               new ReservationCheckPage(user,movieArea,ticket, num_adult, num_teen, num_kids);
+               interrupt();
                
             }
             sleep(1000); // 1/1000초 단위
@@ -75,8 +83,8 @@ public class PayTimer extends JFrame {
    private Font font2 = new Font("나눔바른고딕", Font.PLAIN, 20);
    private Font font3 = new Font("휴먼둥근헤드라인", Font.PLAIN, 35);
    
-   public PayTimer(User user, Ticket ticket, MovieArea movieArea) {
-      setTitle("스레드를 상속받은 타이머 작성");
+   public PayTimer(User user, MovieArea movieArea,Ticket ticket, int num_adult, int num_teen, int num_kids) {
+      setTitle("결제중입니다");
       setSize(WIDTH,HEIGHT);
       setResizable(false);
       setVisible(true);
@@ -128,10 +136,9 @@ public class PayTimer extends JFrame {
       System.out.println(ticket.getPayHow());
       
       //connect_ticket.addTicket(ticket.getUserID(), ticket.getMovieareaKey(), ticket.getPrice(), ticket.getSeatCount(), ticket.getSeatWhere(),ticket.getYymmdd(), ticket.getPayHow());
+      //connect_movieArea.updateMovieArea(movieArea.get_key(),movieArea.getVacantSeat()-ticket.getSeatCount(), movieArea.getSeatState());
       
-      connect_movieArea.updateMovieArea(movieArea.get_key(),movieArea.getVacantSeat()-ticket.getSeatCount(), movieArea.getSeatState());
-      
-      Timer2 t2 = new Timer2(this,iconLoading,user);
+      Timer2 t2 = new Timer2(this,iconLoading,user,movieArea,ticket,num_adult,num_teen,num_kids);
       t2.start();
       
    }

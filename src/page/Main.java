@@ -23,6 +23,7 @@ public class Main {
 		//new P_InformationPage(user);
 		//new ChartPage();
 		//new ChangePage();
+		
 	}
 
 }

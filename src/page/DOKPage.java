@@ -84,12 +84,6 @@ public class DOKPage extends CategoryFrame {
          topPanel.add(iconSignUp);
       }
       
-      //Panel
-      panel.setBackground(Color.WHITE);
-      panel.setBounds(0,(int) (Main.SCREEN_HEIGHT*0.25),Main.SCREEN_WIDTH,(int)(Main.SCREEN_HEIGHT*0.75));
-      panel.setLayout(null);
-      add(panel);
-      
       //박스 오피스 Label
       boxoffice.setBounds(200,80,200,50);
       boxoffice.setIcon(imgBoxoffice);
@@ -134,6 +128,13 @@ public class DOKPage extends CategoryFrame {
          movieName[i].setHorizontalAlignment(JLabel.CENTER);
          panel.add(movieName[i]);
       }
+
+      //Panel
+      add(panel);
+      panel.setBackground(Color.WHITE);
+      panel.setBounds(0,(int) (Main.SCREEN_HEIGHT*0.25),Main.SCREEN_WIDTH,(int)(Main.SCREEN_HEIGHT*0.75));
+      panel.setLayout(null);
+      
    }
    
    class DOKListener implements ActionListener {
@@ -144,6 +145,5 @@ public class DOKPage extends CategoryFrame {
             new ChartPage(user);
          }
       }
-      
    }
 }

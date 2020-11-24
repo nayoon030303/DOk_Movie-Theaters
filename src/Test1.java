@@ -17,9 +17,7 @@ public class Test1 {
 	public static void main(String[] args) {
 		DB_MovieArea connect = new DB_MovieArea(); 
 		
-		Test t1 = new Test(user, connect.getMovieArea(224));
-		Thread th = new Thread(t1);
-		th.start();
+		
 		
 		
 	}

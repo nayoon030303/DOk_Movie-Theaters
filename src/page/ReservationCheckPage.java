@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import Movie.Movie;
 import Movie.MovieArea;
 import User.User;
 import page.CategoryFrame.windowAdapter;
@@ -51,12 +52,12 @@ public class ReservationCheckPage extends JFrame implements ActionListener, Runn
 	Font plain_font = new Font("나눔바른고딕", Font.PLAIN, 20);
 	Font result_font = new Font("나눔바른고딕", Font.BOLD, 30);
 	
-	public ReservationCheckPage(User user,int num_adult, int num_teen, int num_kids, Vector<String> seat_name, Ticket ticket, MovieArea movieArea) {
+	public ReservationCheckPage(User user,MovieArea movieArea,Ticket ticket,int num_adult, int num_teen, int num_kids) {
 		
 		//금액 측정
-		int adultPrice = num_adult * 10000;
-		int teenPrice = num_teen * 8000;
-		int kidsPrice = num_kids * 5000;
+		int adultPrice = num_adult * Movie.ADULT;
+		int teenPrice = num_teen * Movie.TEEN;
+		int kidsPrice = num_kids * Movie.KIDS;
 		resultPrice = (adultPrice + teenPrice + kidsPrice);
 		
 		//데이터 
@@ -101,14 +102,7 @@ public class ReservationCheckPage extends JFrame implements ActionListener, Runn
 		selectSit.setHorizontalAlignment(JLabel.LEFT);
 		panel.add(selectSit);
 		
-		
-		
-		String[] seat_Name = new String[seat_name.size()];
-		for(int i=0; i<seat_name.size(); i++) {
-			seat_Name[i] = (String)seat_name.get(i);
-		}
-		Arrays.sort(seat_Name);//정렬 오름차순
-		sit.setText(Arrays.toString(seat_Name));
+		sit.setText(ticket.getSeatWhere());
 		sit.setBounds(PaddingLeft, PaddingTop + 425, 400, 50);
 		sit.setFont(plain_font);
 		panel.add(sit);
@@ -143,9 +137,8 @@ public class ReservationCheckPage extends JFrame implements ActionListener, Runn
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == sure) {
-			ticket.setPrice(resultPrice);
-			ticket.setSeatWhere(sit.getText());
-			Thread t1 = new Thread(new PayPage(user,ticket, movieArea));
+
+			
 			//new PayPage(user,ticket, movieArea);
 			dispose();
 		}
@@ -166,4 +159,10 @@ public class ReservationCheckPage extends JFrame implements ActionListener, Runn
 		// TODO Auto-generated method stub
 		
 	}
+	/*
+	 * public static void main(String[] args) { User user = new User(); Ticket
+	 * ticket = new Ticket(); MovieArea movieArea = new MovieArea(); Vector<String>
+	 * seat_name = new Vector<String>(); new ReservationCheckPage(user, 1, 1, 1,
+	 * seat_name, ticket, movieArea); }
+	 */
 }
