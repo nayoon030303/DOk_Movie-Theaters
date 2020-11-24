@@ -107,7 +107,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	private boolean isCheckButton = false;
 	private boolean isNoSchedule = false;
 	private boolean isReset = false;
-	private int none = 0;
+
 	private String str = null;
 	 
 
@@ -436,10 +436,10 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					checkDay = dayAndDayofTable[i].getDay();
 					checkDayofweek = mapDayOfweeks.get(dayAndDayofTable[i].getDayofweek());
 				}
-			}
-			
+			}			
 			// 초기화
 			reset();
+			System.out.println("리셋됨");
 		}
 
 	}
@@ -556,7 +556,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	
 		while (true) {// 무한반복
 			LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
-
+			//System.out.println(currentDateTime);
 			try {
 				
 				// 11시59분 59초 일떄
@@ -581,7 +581,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 				}
 
 				
-				movieAreaContent(currentDateTime);
+				movieAreaContent();
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -591,8 +591,9 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 
 	}
 
-	public void movieAreaContent(LocalDateTime currentDateTime) throws ParseException {
+	public void movieAreaContent() throws ParseException {	
 		while(isReset) {
+			LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
 			movieAreas = moviearea_connect.getMovieArea(movieKey, theaterKey, checkDayofweek % 7);// 영화 데이터 받기
 			if (isCheckButton && isNoSchedule && movieAreas.size()<=0 ) {// 데이터가 없다면
 				for (int i = 0; i < content.length; i++) {
@@ -616,14 +617,12 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					// 비어있는좌석 수가 없다면
 					if (movieAreas.get(i).getVacantSeat() <= 0) {
 						content[i].setEnabled(false);									
-					}else {
-						content[i].setEnabled(true);
 					}
 					str = checkYear + "-" + checkMonth + "-" + checkDay + " " + movieAreas.get(i).getStartTime();
-					LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd H:mm"));
-					if (movieTime.compareTo(currentDateTime) < 0) {// 상영영화가 현재 시간보다 작으면
+					LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm"));
+					if (movieTime.compareTo(currentDateTime) <=0) {// 상영영화가 현재 시간보다 작으면 또는 같은면
 						content[i].setEnabled(false);// 샹엉 불가능
-					} 
+					}
 					
 				}else {
 					isReset = false;
