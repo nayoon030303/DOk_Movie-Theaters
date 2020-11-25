@@ -6,13 +6,15 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
 
+import Movie.MovieArea;
 import User.User;
 
 public class DB_ticket {
 	private Connection con;
 	private Statement st;
 	private ResultSet rs;
-	private Vector<Ticket> ticket = new Vector<Ticket>();
+	private Ticket ticket;
+	private Vector<Ticket> tickets = new Vector<Ticket>();
 		
 	public DB_ticket() {
 		try{
@@ -43,5 +45,39 @@ public class DB_ticket {
 			System.out.println("데이터베이스 검색 오류:"+ e.getMessage());
 		}
 		return false;
+	}
+	
+	public Vector<Ticket>  getTicket(String userID) {
+		try {
+			tickets.clear();
+			String SQL = "select* from ticket where userID like \""+userID+"\" order by yymmdd desc";
+			//System.out.println(SQL);
+			rs = st.executeQuery(SQL);
+
+			while (rs.next()) {
+				ticket = new Ticket();
+				ticket.set_key(rs.getInt("_key"));
+				ticket.setMovieareaKey(rs.getInt("movieareaKey"));
+				ticket.setPrice(rs.getInt("price"));
+				ticket.setSeatCount(rs.getInt("seatCount"));
+				ticket.setSeatWhere(rs.getString("seatWhere"));
+				ticket.setYymmdd(rs.getString("yymmdd"));
+				ticket.setPayHow(rs.getString("payHow"));
+			
+				tickets.add(ticket);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("getTicket데이터베이스 검색 오류:" + e.getLocalizedMessage());
+		}finally {
+			try {
+				if(rs!=null) {rs.close();}
+				//if(st!=null) {st.close();}
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		return tickets;
 	}
 }

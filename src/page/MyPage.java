@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -13,7 +14,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import Area.DB_Area;
+import Movie.DB_MovieArea;
+import Movie.DB_MovieInfo;
+import Movie.Movie;
+import Movie.MovieArea;
 import User.User;
+import theater.DB_Theater;
+import theater.Theater;
+import ticket.DB_ticket;
+import ticket.Ticket;
 
 
 public class MyPage extends CategoryFrame{
@@ -39,22 +49,27 @@ public class MyPage extends CategoryFrame{
 	private JLabel userInfo = new JLabel("개인 정보");
 	private JLabel record_movie = new JLabel();
 	private JLabel record_movieInfo = new JLabel();
+	private JLabel[] recent_movieInfo = new JLabel[4];
+	private Vector<Ticket> tickets = new Vector<Ticket>();
 	
 	
 	//Design
-	Font font1 = new Font("휴먼둥근헤드라인", Font.PLAIN, 25);
-	Font font2 = new Font("휴먼둥근헤드라인", Font.PLAIN, 15);
-	
-	ImageIcon imgInfo = new ImageIcon("src/imges/info.png");
-	ImageIcon imgRecord = new ImageIcon("src/imges/record.png");
-	ImageIcon imgReInfo = new ImageIcon("src/imges/re_info.png");
-	ImageIcon imgReProfile = new ImageIcon("src/imges/re_profile.png");
+	private Font font1 = new Font("휴먼둥근헤드라인", Font.PLAIN, 25);
+	private Font font2 = new Font("휴먼둥근헤드라인", Font.PLAIN, 15);
+
+	private ImageIcon imgInfo = new ImageIcon("src/imges/info.png");
+	private ImageIcon imgRecord = new ImageIcon("src/imges/record.png");
+	private ImageIcon imgReInfo = new ImageIcon("src/imges/re_info.png");
+	private ImageIcon imgReProfile = new ImageIcon("src/imges/re_profile.png");
 	//프로필 사진들
-	ImageIcon userIcon;
+	private ImageIcon userIcon;
+	private Color purple = new Color(82, 12, 139);
 
-	
-	Color purple = new Color(82, 12, 139);
-
+	//DB
+	private DB_ticket connect_ticket = new DB_ticket();
+	private DB_MovieArea connect_movieArea = new DB_MovieArea();
+	private DB_Theater coneect_theater = new DB_Theater();
+	private DB_MovieInfo connect_movie  = new DB_MovieInfo();
 	
 	public MyPage() {}
 	public MyPage(User user) {
@@ -66,6 +81,9 @@ public class MyPage extends CategoryFrame{
 		getContentPane().setLayout(null);//레이아웃 null
 		setVisible(true);
 		
+		
+		
+		tickets = connect_ticket.getTicket(user.getUserID());
 		this.user = user;
 		
 		//프로필 사진
@@ -143,7 +161,6 @@ public class MyPage extends CategoryFrame{
 		panel.add(record_movie);
 		
 		//최근 예매한 영화
-		record_movieInfo.setText("아직 최근 예매하신 내역이 없으시네요 !");
 		record_movieInfo.setHorizontalAlignment(JLabel.CENTER);
 		record_movieInfo.setBounds(POS_X_CENTER - 50, PaddingTop + 365, 650, 250);
 		record_movieInfo.setFont(font2);
@@ -156,6 +173,37 @@ public class MyPage extends CategoryFrame{
 		panel.setBounds(0,(int) (Main.SCREEN_HEIGHT*0.25),Main.SCREEN_WIDTH,(int)(Main.SCREEN_HEIGHT*0.75));
 		panel.setLayout(null);
 		add(panel);
+		
+		if(tickets.size()>0) {
+			int num =0;
+			if(tickets.size()>4) {
+				num = 4;
+			}else{
+				num = tickets.size();
+			}
+			for(int i=0; i<num; i++) {
+				recent_movieInfo[i] = new JLabel();
+				recent_movieInfo[i].setBorder(new LineBorder(purple, 1));
+				recent_movieInfo[i].setBackground(Color.red);
+				recent_movieInfo[i].setBounds(POS_X_CENTER - 50, PaddingTop+300+(250/4)*(i+1)+3, 650, 250/4);
+				String yymmdd,movieName,area,country,startTime,hall;
+				int a = tickets.get(i).getMovieareaKey();
+				MovieArea movieArea = connect_movieArea.getMovieArea(a);
+				int areaKey = movieArea.getArea_key();
+				Theater theater = coneect_theater.getTheater(areaKey);
+				Movie movie = connect_movie.getMovie(movieArea.getMovieKey()); 
+				yymmdd = tickets.get(i).getYymmdd();
+				movieName = movie.getM_name();
+				area = theater.getArea();
+				country = theater.getCountry();
+				startTime = movieArea.getStartTime();
+				hall = movieArea.getHall();
+				recent_movieInfo[i].setText("<html>" +yymmdd+"&nbsp;&nbsp;&nbsp;&nbsp;"+ movieName+"&nbsp;&nbsp;&nbsp;&nbsp;"+area + "&nbsp;&nbsp;" + country+"&nbsp;&nbsp;"+hall+"</html>");
+				panel.add(recent_movieInfo[i]);
+			}
+		}else {
+			record_movieInfo.setText("아직 최근 예매하신 내역이 없으시네요 !");
+		}
 	}
 	
 	public class BtnEvent implements ActionListener {

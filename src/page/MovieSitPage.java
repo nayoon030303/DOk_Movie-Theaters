@@ -67,6 +67,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	private MovieArea movieArea;
 	private Ticket ticket = new Ticket();
 	private String seatState;
+	private String yymmdd;
 
 	// Design
 	private Font sit_font = new Font("나눔바른고딕", Font.BOLD, 15);
@@ -75,7 +76,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	// DB
 	private DB_MovieArea connect_movieArea = new DB_MovieArea();
 
-	public MovieSitPage(User user, MovieArea pre_movieArea) {
+	public MovieSitPage(User user, MovieArea pre_movieArea, String yymmdd) {
 		super("영화 좌석 선택");
 		setSize(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
 		setResizable(false);
@@ -86,6 +87,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 		startRunMovieSit = true;
 		
 		// 정보 연결
+		this.yymmdd = yymmdd;
 		this.user = user;
 		this.movieArea = connect_movieArea.getMovieArea(pre_movieArea.get_key());
 		seatState = movieArea.getSeatState();
@@ -93,7 +95,8 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 		// ticket에 정보 set
 		ticket.setUserID(user.getUserID());
 		ticket.setMovieareaKey(movieArea.get_key());
-
+		ticket.setYymmdd(yymmdd);
+		
 		gray.setBackground(Color.LIGHT_GRAY);
 
 		// 영화 좌석 정보	 예매1 비어있는자리 0	
@@ -216,8 +219,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 			for (int i = 0; i < sit.length; i++) {
 				for (int j = 0; j < sit[i].length; j++) {
 					if (e.getSource() == sit[i][j] && (sit[i][j].getBackground() == gray.getBackground())) {// 회색좌석을
-						// System.out.println(isCountStart);
-						// System.out.println("통과");
+						
 						if (num_adult == 0 && num_teen == 0 && num_kids == 0) {// 숫자를 선택하지 않았을 때
 							JOptionPane.showMessageDialog(null, "인원을 선택해주세요");
 						} else if (count <= selectCount) {// 좌석수가 넘어갈 떄
@@ -295,8 +297,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 							}
 						}
 					}
-					System.out.println(c);
-					System.out.println(count);
+					
 					// 예매 가능한
 					if (c == count) {
 						seatState = seatState.replace("2", "1");// 2를 1로 치환
@@ -316,7 +317,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 					
 					} else {
 						JOptionPane.showMessageDialog(null, "이미 선택된 좌석입니다.");
-						MovieSitPage t1 = new MovieSitPage(user, movieArea);
+						MovieSitPage t1 = new MovieSitPage(user, movieArea,yymmdd);
 						Thread th = new Thread(t1);
 						th.start();
 					}
@@ -354,9 +355,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("run2시작");
 		while (true) {
-			//System.out.println("r2");
 			if(startRunMovieSit) {
 				num_adult = comboboxAdult.getSelectedIndex();
 				num_teen = comboboxTeen.getSelectedIndex();

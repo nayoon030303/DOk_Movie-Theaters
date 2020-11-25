@@ -12,6 +12,7 @@ public class DB_Theater {
 	private Statement st;
 	private ResultSet rs;
 	private Theater[] theaters;
+	private Theater theater;
 	
 	
 	public DB_Theater() {
@@ -67,6 +68,27 @@ public class DB_Theater {
 		return theaters;
 		
 	}
+	
+	public Theater getTheater(int key) {
+		try {
+			String SQL = "SELECT* FROM theaterinfo where _key like "+key;
+			rs = st.executeQuery(SQL);
+			int n = 0;
+			while(rs.next()) {
+				theater = new Theater();
+				theater.setArea(rs.getString("area"));
+				theater.setCountry(rs.getString("country"));
+				
+			}
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("getArea데이터베이스 검색 오류:"+ e.getLocalizedMessage());
+		}
+		return theater;
+		
+	}
+	
 	public Theater[] getTheater(String area) {
 		try {
 			String SQL = "SELECT* FROM theaterinfo where area like \""+area+"\";";

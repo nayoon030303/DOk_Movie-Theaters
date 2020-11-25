@@ -127,16 +127,17 @@ public class PayTimer extends JFrame {
       panel.setBackground(Color.WHITE);
       
       
-      System.out.println(ticket.getUserID());
-      System.out.println(ticket.getMovieareaKey());
-      System.out.println(ticket.getPrice());
-      System.out.println(ticket.getSeatCount());
-      System.out.println(ticket.getSeatWhere());
-      System.out.println(ticket.getYymmdd());
-      System.out.println(ticket.getPayHow());
-      
-      //connect_ticket.addTicket(ticket.getUserID(), ticket.getMovieareaKey(), ticket.getPrice(), ticket.getSeatCount(), ticket.getSeatWhere(),ticket.getYymmdd(), ticket.getPayHow());
-      //connect_movieArea.updateMovieArea(movieArea.get_key(),movieArea.getVacantSeat()-ticket.getSeatCount(), movieArea.getSeatState());
+		/*
+		 * System.out.println(ticket.getUserID());
+		 * System.out.println(ticket.getMovieareaKey());
+		 * System.out.println(ticket.getPrice());
+		 * System.out.println(ticket.getSeatCount());
+		 * System.out.println(ticket.getSeatWhere());
+		 * System.out.println(ticket.getYymmdd());
+		 * System.out.println(ticket.getPayHow());
+		 */
+      connect_ticket.addTicket(ticket.getUserID(), ticket.getMovieareaKey(), ticket.getPrice(), ticket.getSeatCount(), ticket.getSeatWhere(),ticket.getYymmdd(), ticket.getPayHow());
+      connect_movieArea.updateMovieArea(movieArea.get_key(),movieArea.getVacantSeat()-ticket.getSeatCount(), movieArea.getSeatState());
       
       Timer2 t2 = new Timer2(this,iconLoading,user,movieArea,ticket,num_adult,num_teen,num_kids);
       t2.start();

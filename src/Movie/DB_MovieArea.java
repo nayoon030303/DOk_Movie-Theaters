@@ -26,8 +26,7 @@ public class DB_MovieArea {
 		// movieArea = new MovieArea[countMovieArea()];
 	}
 
-	public void makeMovie_Area(int area_key, String hall, int weeks, String startTime, int movieKey, int vacantSeat,
-			String seatState){
+	public void makeMovie_Area(int area_key, String hall, int weeks, String startTime, int movieKey, int vacantSeat,String seatState){
 		try {
 			String SQL = "INSERT INTO moviearea(area_key, hall , weeks, startTime, movieKey, vacantSeat, seatState)"
 					+ "VALUES(\"" + area_key + "\",\"" + hall + "\",\"" + weeks + "\",\"" + startTime + "\",\""
@@ -51,6 +50,23 @@ public class DB_MovieArea {
 				e.printStackTrace();
 			}
 			
+		}
+	}
+	
+	
+	public void UpdateMovieAreas(int weeks) {
+		try {
+			String SQL = "UPDATE moviearea SET vacantSeat = 216 , seatState = \"000000000000000000000000/000000000000000000000000/000000000000000000000000/000000000000000000000000/000000000000000000000000/000000000000000000000000/000000000000000000000000/000000000000000000000000/000000000000000000000000\" "
+					+ "where weeks like "+ weeks;
+			
+			int success = st.executeUpdate(SQL);
+
+			if (success != 1) {
+				System.out.println("error");
+			}
+			
+		}catch (Exception e) {
+			// TODO: handle exception
 		}
 	}
 

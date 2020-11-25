@@ -58,13 +58,14 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 	private ImageIcon imgFinish = new ImageIcon("src/imges/finish.png");
 
 	private String howPay = card.getText();
-	private String yymmdd;
+
 	private Ticket ticket;
 	private User user;
 	private MovieArea movieArea;
 	private int num_adult, num_teen, num_kids;
 	private boolean startPayPage = false;
-
+	private int moviePrice;
+	
 	// 날짜
 	private SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -81,8 +82,7 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 		howMuch.setFont(compo);
 		panel.add(howMuch);
 
-		int moviePrice = num_adult * Movie.ADULT + num_teen * Movie.TEEN + num_kids * Movie.KIDS;
-		System.out.println(moviePrice);
+		moviePrice = num_adult * Movie.ADULT + num_teen * Movie.TEEN + num_kids * Movie.KIDS;
 		price.setBounds(PaddingLeft + 150, PaddingTop - 115, 275, 50);
 		price.setFont(new Font("나눔바른고딕", Font.PLAIN, 20));
 		price.setText(moviePrice + " 원");
@@ -236,14 +236,12 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == finish) {
-			yymmdd = format1.format(System.currentTimeMillis());
-			ticket.setYymmdd(yymmdd);
 			ticket.setPayHow(howPay);
 
 			if ((card.isSelected()
 					&& (inputCardNumber.getText().length() > 1 && inputCardPassword.getText().length() > 1))
 					|| (cash.isSelected() && inputName.getText().length() > 1)) {
-				ticket.setYymmdd(yymmdd);
+				ticket.setPrice(moviePrice);
 				startPayPage = false;
 				new PayTimer(user, movieArea, ticket, num_adult, num_teen, num_kids);// pay타이머
 				dispose();
@@ -276,7 +274,6 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 			//System.out.println(second);
 			try {
 				if (second > 30) {
-					System.out.println("시간초과");
 					JOptionPane message = new JOptionPane();// 메시지 박스 객체
 					message.showMessageDialog(null, "결제 시간을 초과 햐였습니다. 다시 메인 페이지로 돌아갑니다.");
 					new DOKPage(user);

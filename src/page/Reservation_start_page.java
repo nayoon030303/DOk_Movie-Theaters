@@ -110,6 +110,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	private boolean isReset = false;
 	private boolean isNextDay = false;
 
+	private String yymmdd = null;
 	private String str = null;
 	 
 
@@ -461,7 +462,11 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 			if (user.getUserID() != null) {
 				for (int i = 0; i < content.length; i++) {
 					if (e.getSource() == content[i]) {
-						Thread t1 = new Thread(new MovieSitPage(user, content[i].getMovieArea()));
+						//페이지 넘어감
+						yymmdd = checkYear+"."+checkMonth+"."+checkDay;
+						//System.out.println(yymmdd);
+						MovieSitPage mpage = new MovieSitPage(user, content[i].getMovieArea(), yymmdd);
+						Thread t1 = new Thread(mpage);
 						t1.start();
 						startRunReservation_start = false;
 						System.out.println("종료");
@@ -566,18 +571,17 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	@Override
 	public void run() {
 		while (true) {// 무한반복
-			//System.out.println("r1");
 			if(startRunReservation_start) {
 				LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
-				//System.out.println(currentDateTime);
 				try {
 					
 					if((currentDateTime.getHour() == 23 && currentDateTime.getMinute() == 59 && currentDateTime.getSecond() == 59) || isNextDay) {
-						Thread.sleep(1000);
+						Thread.sleep(1000);					
+						int weeks = mapDayOfweeks.get(currentDateTime.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN));
 						int c =1;
-						for (int i = 0; i < dayAndDayofTable.length; i++) {					
+						for (int i = 0; i < dayAndDayofTable.length; i++) {		
 							LocalDateTime newDate = currentDateTime.plusDays(c);	
-							System.out.println(newDate);
+			
 							int year = newDate.getYear();//년도
 							int month = newDate.getMonthValue(); // 월
 							int day = newDate.getDayOfMonth();// 날짜
@@ -590,7 +594,8 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 							dayAndDayofTable[i].setDayofweek(dayofweek);
 							timePanel.add(dayAndDayofTable[i]);
 							c++;
-						}										
+						}	
+						moviearea_connect.UpdateMovieAreas(weeks);
 						reset();
 						isNextDay = false;
 					}

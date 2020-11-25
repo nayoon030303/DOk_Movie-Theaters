@@ -9,30 +9,30 @@ public class DB_MovieInfo {
 	private Connection con;
 	private Statement st;
 	private ResultSet rs;
-	//private final static int MOVIE_NUM = 70;
-	private static  Movie[] movies; //백터로 바꾸기
-	
-	
+	// private final static int MOVIE_NUM = 70;
+	private Movie[] movies; // 백터로 바꾸기
+	private Movie movie;
+
 	public DB_MovieInfo() {
-		try{
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/DOK?serverTimezone=Asia/Seoul","root","mirim2");
+			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/DOK?serverTimezone=Asia/Seoul", "root",
+					"mirim2");
 			st = con.createStatement();
-		}catch (Exception e) {
-			System.out.println("데이터 베이스 연결 오류:"+e.getMessage());
+		} catch (Exception e) {
+			System.out.println("데이터 베이스 연결 오류:" + e.getMessage());
 		}
 		movies = new Movie[countMovie()];
 	}
 
-	
 	public Movie[] getMovieInfoAll(String calum) {
-		
+
 		try {
-			String SQL = "select* from movie order by "+calum+" desc";
-			//System.out.println(SQL);
+			String SQL = "select* from movie order by " + calum + " desc";
+			// System.out.println(SQL);
 			rs = st.executeQuery(SQL);
-			int n=0;
-			while(rs.next()) {
+			int n = 0;
+			while (rs.next()) {
 				/*
 				 * System.out.println(rs.getString("m_name"));
 				 * System.out.println(rs.getString("genre"));
@@ -40,7 +40,7 @@ public class DB_MovieInfo {
 				 * System.out.println(rs.getInt("audience"));
 				 * System.out.println(rs.getDouble("rating"));
 				 */
-				
+
 				movies[n] = new Movie();
 				movies[n].set_key(rs.getInt("_key"));
 				movies[n].setM_name(rs.getString("m_name"));
@@ -54,21 +54,42 @@ public class DB_MovieInfo {
 				movies[n].setDisributor(rs.getString("distributor"));
 				n++;
 			}
-			
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("DBMovieInfo데이터베이스 검색 오류:"+ e.getLocalizedMessage());
+			System.out.println("DBMovieInfo데이터베이스 검색 오류:" + e.getLocalizedMessage());
 		}
 		return movies;
 	}
-	public Movie[] getMovieInfo(String genr,String calum) {
-		
+
+	public Movie getMovie(int key) {
+
 		try {
-			String SQL = "select* from movie where genre like '"+genr +"' order by "+ calum+" desc";
+			String SQL = "select* from movie where  _key like "+key;
 			//System.out.println(SQL);
 			rs = st.executeQuery(SQL);
-			int n=0;
-			while(rs.next() ) {
+
+			while (rs.next()) {
+				
+				movie = new Movie();
+				movie.setM_name(rs.getString("m_name"));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("DBMovieInfo데이터베이스 검색 오류:" + e.getLocalizedMessage());
+		}
+		return movie;
+	}
+
+	public Movie[] getMovieInfo(String genr, String calum) {
+
+		try {
+			String SQL = "select* from movie where genre like '" + genr + "' order by " + calum + " desc";
+			// System.out.println(SQL);
+			rs = st.executeQuery(SQL);
+			int n = 0;
+			while (rs.next()) {
 				/*
 				 * System.out.println(rs.getString("m_name"));
 				 * System.out.println(rs.getString("genre"));
@@ -76,7 +97,7 @@ public class DB_MovieInfo {
 				 * System.out.println(rs.getInt("audience"));
 				 * System.out.println(rs.getDouble("rating"));
 				 */
-				
+
 				movies[n] = new Movie();
 				movies[n].set_key(rs.getInt("_key"));
 				movies[n].setM_name(rs.getString("m_name"));
@@ -88,13 +109,13 @@ public class DB_MovieInfo {
 				movies[n].setCountry(rs.getString("country"));
 				movies[n].setRunning_time(rs.getInt("running_time"));
 				movies[n].setDisributor(rs.getString("distributor"));
-				
+
 				n++;
 			}
-			
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("DBMovieInfo데이터베이스 검색 오류:"+ e.getLocalizedMessage());
+			System.out.println("DBMovieInfo데이터베이스 검색 오류:" + e.getLocalizedMessage());
 		}
 		return movies;
 	}
@@ -104,10 +125,10 @@ public class DB_MovieInfo {
 		try {
 			String SQL = " SELECT COUNT(*)  FROM movie";
 			rs = st.executeQuery(SQL);
-			if(rs.next()) {
+			if (rs.next()) {
 				n = rs.getInt("COUNT(*)");
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			// TODO: handle exception
 		}
 		return n;

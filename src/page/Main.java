@@ -12,7 +12,8 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		new DOKPage(user);
+		new LoadingPage(user);
+		//new DOKPage(user);
 		//new  Reservation_start_page(user);
 		//new LoginPage();
 		//new MovieSitPage();

@@ -12,7 +12,7 @@ public class Ticket {
 	
 	public Ticket() {}
 
-	public Ticket(int _key, String userID, int movieareaKey, int price, int seatCount, String seatWhere, String yymmdd,
+	public Ticket(int _key, String userID,int movieareaKey, int price, int seatCount, String seatWhere, String yymmdd,
 			String payHow) {
 		super();
 		this._key = _key;
