@@ -13,10 +13,10 @@ public class Test1 {
 
 	public static void main(String[] args) {
 		LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
-		String str = "2020-11-24 13:00";
-		LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd H:mm"));
+		String str = "2020-11-27 19:40";
+		LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm"));
 		
-		if (movieTime.compareTo(currentDateTime) < 0) {// 상영영화가 현재 시간보다 작으면
+		if (movieTime.compareTo(currentDateTime) <= 0) {// 상영영화가 현재 시간보다 작으면
 			System.out.println("문제2");
 		}else {
 			System.out.println("가능");

@@ -107,6 +107,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	private boolean isCheckButton = false;
 	private boolean isNoSchedule = false;
 	private boolean isReset = false;
+	private boolean isNextDay = false;
 
 	private String str = null;
 	 
@@ -565,28 +566,27 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 			//System.out.println(currentDateTime);
 			try {
 				
-				// 11시59분 59초 일떄
-				if (currentDateTime.getHour() == 23 && currentDateTime.getMinute() == 59 && currentDateTime.getSecond() == 59) { 
-					LocalDateTime newDate = currentDateTime.plusDays(1);					
-					int year = currentDateTime.getYear();//년도
-					int month = currentDateTime.getMonthValue(); // 월
-					int day = currentDateTime.getDayOfMonth();// 날짜
-					String dayofweek = currentDateTime.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);// 요일
-					//int endDate = cal.getActualMaximum(Calendar.DAY_OF_MONTH);// 이달의 마지막 날짜
-					for (int i = 0; i < dayAndDayofTable.length; i++) {
-					
-						dayAndDayofTable[i].setText(day + "**" + dayofweek);
+				if((currentDateTime.getHour() == 23 && currentDateTime.getMinute() == 59 && currentDateTime.getSecond() == 59) || isNextDay) {
+					Thread.sleep(1000);
+					int c =1;
+					for (int i = 0; i < dayAndDayofTable.length; i++) {					
+						LocalDateTime newDate = currentDateTime.plusDays(c);	
+						System.out.println(newDate);
+						int year = newDate.getYear();//년도
+						int month = newDate.getMonthValue(); // 월
+						int day = newDate.getDayOfMonth();// 날짜
+						String dayofweek = newDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);// 요일
+						
+						dayAndDayofTable[i].setText(day + "*" + dayofweek);
 						dayAndDayofTable[i].setYear(year);
 						dayAndDayofTable[i].setMonth(month);
 						dayAndDayofTable[i].setDay(day);
 						dayAndDayofTable[i].setDayofweek(dayofweek);
 						timePanel.add(dayAndDayofTable[i]);
-
+						c++;
 					}										
 					reset();
 				}
-
-				
 				movieAreaContent();
 
 			} catch (Exception e) {
@@ -600,6 +600,12 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 	public void movieAreaContent() throws ParseException {	
 		while(isReset) {
 			LocalDateTime currentDateTime = LocalDateTime.now();// 현재 날짜와 시간
+			// 11시59분 59초 일떄
+			if (currentDateTime.getHour() == 23 && currentDateTime.getMinute() == 59 && currentDateTime.getSecond() == 59) {
+				isReset = false;
+				isNextDay = true;
+				System.out.println("바뀜");
+			}
 			movieAreas = moviearea_connect.getMovieArea(movieKey, theaterKey, checkDayofweek % 7);// 영화 데이터 받기
 			if (isCheckButton && isNoSchedule && movieAreas.size()<=0 ) {// 데이터가 없다면
 				for (int i = 0; i < content.length; i++) {
@@ -624,7 +630,23 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 					if (movieAreas.get(i).getVacantSeat() <= 0) {
 						content[i].setEnabled(false);									
 					}
-					str = checkYear + "-" + checkMonth + "-" + checkDay + " " + movieAreas.get(i).getStartTime();
+					
+					String checkMonthE ="";
+					String checkDayE ="";
+					//month이 한자리 수라면
+					if(String.valueOf(checkMonth).length()<=1) {
+						checkMonthE ="0"+checkMonth;
+					}else {
+						checkMonthE = String.valueOf(checkMonth);
+					}
+					//day가 한자리 수라면
+					if(String.valueOf(checkDay).length()<=1) {
+						checkDayE ="0"+checkDay;
+					}else {
+						checkDayE = String.valueOf(checkDay);
+					}
+					str = checkYear + "-" + checkMonthE + "-" + checkDayE + " " + movieAreas.get(i).getStartTime();
+					System.out.println(str);
 					LocalDateTime movieTime = LocalDateTime.parse(str, DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm"));
 					if (movieTime.compareTo(currentDateTime) <=0) {// 상영영화가 현재 시간보다 작으면 또는 같은면
 						content[i].setEnabled(false);// 샹엉 불가능
