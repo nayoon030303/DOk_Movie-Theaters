@@ -2,6 +2,8 @@ package page;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -32,6 +34,10 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 	private final static int PaddingTop = 175;
 	private final static int PRICE_Y = 50;
 
+	Toolkit toolkit = Toolkit.getDefaultToolkit();
+	Image img = toolkit.getImage("src/imges/p_octopus.png");
+	
+	
 	// component
 	private JPanel panel = new JPanel();
 	private JLabel howMuch = new JLabel("최종결제금액 :");
@@ -76,7 +82,7 @@ public class PayPage extends JFrame implements ActionListener, Runnable {
 	public PayPage(User user, Ticket ticket, MovieArea movieArea, int num_adult, int num_teen, int num_kids) {
 
 		addWindowListener(new windowAdapter());
-
+		setIconImage(img);
 		// 최종결제
 		howMuch.setBounds(PaddingLeft, PaddingTop - 115, 275, 50);
 		howMuch.setFont(compo);

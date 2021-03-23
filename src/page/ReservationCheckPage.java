@@ -2,6 +2,8 @@ package page;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -38,6 +40,9 @@ public class ReservationCheckPage extends JFrame implements ActionListener, Runn
    private JLabel goContineu = new JLabel("결제가 완료되었습니다.");
    private JButton sure = new JButton();
    
+   Toolkit toolkit = Toolkit.getDefaultToolkit();
+	Image img = toolkit.getImage("src/imges/p_octopus.png");
+   
    //이미지
    private ImageIcon imgSure = new ImageIcon("src/img/check.png");
    
@@ -55,6 +60,8 @@ public class ReservationCheckPage extends JFrame implements ActionListener, Runn
    
    public ReservationCheckPage(User user,MovieArea movieArea,Ticket ticket,int num_adult, int num_teen, int num_kids) {
       
+	   setIconImage(img);
+	   
       //금액 측정
       int adultPrice = num_adult * Movie.ADULT;
       int teenPrice = num_teen * Movie.TEEN;
@@ -133,6 +140,7 @@ public class ReservationCheckPage extends JFrame implements ActionListener, Runn
       panel.setLayout(null);
       panel.setBackground(Color.WHITE);
       
+      setTitle("영수증");
       setSize(500, 900);
       setVisible(true);
       setResizable(false);
@@ -144,18 +152,19 @@ public class ReservationCheckPage extends JFrame implements ActionListener, Runn
    @Override
    public void actionPerformed(ActionEvent e) {
       if(e.getSource() == sure) {
+    	  new DOKPage(user);
          dispose();
-         new MyPage(user);
       }
    }
    class windowAdapter extends WindowAdapter{
 
       @Override
       public void windowClosing(WindowEvent e) {
-           int result = JOptionPane.showConfirmDialog(null,"예매를 취소하시겠습니까?");
+           int result = JOptionPane.showConfirmDialog(null,"영수증화면을 종료하시겠습니까?");
            if (result==JOptionPane.OK_OPTION) {
+        	   new DOKPage(user);
               dispose();
-              new DOKPage(user);
+              
            }
       }  
    }

@@ -28,9 +28,9 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	private final static int PaddingLeft = 150;
 	private final static int PaddingTop = 125;
 
-	private final static int NO_SELECT = 0;
-	private final static int PRE_SELECT = 1;
-	private final static int NOW_SELECT = 2;
+	final static int NO_SELECT = 0;
+	final static int PRE_SELECT = 1;
+	final static int NOW_SELECT = 2;
 
 	// component
 	private JPanel panel = new JPanel();
@@ -68,7 +68,8 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 	private Ticket ticket = new Ticket();
 	private String seatState;
 	private String yymmdd;
-
+	private MovieArea pre_MovieArea;
+	
 	// Design
 	private Font sit_font = new Font("나눔바른고딕", Font.BOLD, 15);
 	private Font people = new Font("나눔바른고딕", Font.PLAIN, 25);
@@ -87,6 +88,7 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 		startRunMovieSit = true;
 		
 		// 정보 연결
+		this.pre_MovieArea = pre_MovieArea;
 		this.yymmdd = yymmdd;
 		this.user = user;
 		this.movieArea = connect_movieArea.getMovieArea(pre_movieArea.get_key());
@@ -277,53 +279,10 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 				seatState += '/';
 			}
 
+		
 			// 다음 버튼
 			if (e.getSource() == next) {
-				if (num_adult == 0 && num_teen == 0 && num_kids == 0) {
-					JOptionPane.showMessageDialog(null, "인원을 선택해주세요");
-				} else {
-					// DB_MovieArea에서 seatState 받기
-					String db_seatState = connect_movieArea.getMovieArea(movieArea.get_key()).getSeatState();
-					int[][] intdb_seatSit = new int[9][24];
-					
-					//영화 좌석 정보	 예매1 비어있는자리 0	
-					intdb_seatSit = setReservationSeat(db_seatState, intdb_seatSit);
-				
-					int c = 0;
-					for (int i = 0; i < 9; i++) {
-						for (int j = 0; j < 24; j++) {
-							if (intdb_seatSit[i][j] == NO_SELECT && int_selectedSit[i][j] == NOW_SELECT) {
-								c++;
-							}
-						}
-					}
-					
-					// 예매 가능한
-					if (c == count) {
-						seatState = seatState.replace("2", "1");// 2를 1로 치환
-						String[] seat_Name = new String[seatName.size()];
-						for(int i=0; i<seatName.size(); i++) {
-							seat_Name[i] = (String)seatName.get(i);
-						}
-						Arrays.sort(seat_Name);//정렬 오름차순
-						// 정보들 저장
-						
-						ticket.setSeatWhere(Arrays.toString(seat_Name));
-						ticket.setSeatCount(selectCount);
-						movieArea.setSeatState(seatState);
-						Thread t1 = new Thread(new PayPage(user, ticket, movieArea,num_adult,num_teen, num_kids));
-						t1.start();
-						startRunMovieSit = false;
-					
-					} else {
-						JOptionPane.showMessageDialog(null, "이미 선택된 좌석입니다.");
-						MovieSitPage t1 = new MovieSitPage(user, movieArea,yymmdd);
-						Thread th = new Thread(t1);
-						th.start();
-					}
-
-					dispose();
-				} // 동작 끝
+				TestResevation();
 			}
 
 		}
@@ -373,10 +332,54 @@ public class MovieSitPage extends CategoryFrame implements Runnable {
 
 		}
 		
+	}
+	
+	public void TestResevation() {
+		if (num_adult == 0 && num_teen == 0 && num_kids == 0) {
+			JOptionPane.showMessageDialog(null, "인원을 선택해주세요");
+		} else {
+			// DB_MovieArea에서 seatState 받기
+			String db_seatState = connect_movieArea.getMovieArea(movieArea.get_key()).getSeatState();
+			int[][] intdb_seatSit = new int[9][24];
+			
+			//영화 좌석 정보	 예매1 비어있는자리 0	
+			intdb_seatSit = setReservationSeat(db_seatState, intdb_seatSit);
 		
-		
-		
+			int c = 0;
+			for (int i = 0; i < 9; i++) {
+				for (int j = 0; j < 24; j++) {
+					if (intdb_seatSit[i][j] == NO_SELECT && int_selectedSit[i][j] == NOW_SELECT) {
+						c++;
+					}
+				}
+			}
+			
+			// 예매 가능한
+			if (c == count) {
+				//seatState = seatState.replace("2", "1");// 2를 1로 치환
+				String[] seat_Name = new String[seatName.size()];
+				for(int i=0; i<seatName.size(); i++) {
+					seat_Name[i] = (String)seatName.get(i);
+				}
+				Arrays.sort(seat_Name);//정렬 오름차순
+				// 정보들 저장
+				
+				ticket.setSeatWhere(Arrays.toString(seat_Name));
+				ticket.setSeatCount(selectCount);
+				movieArea.setSeatState(seatState);
+				Thread t1 = new Thread(new PayPage(user, ticket, movieArea,num_adult,num_teen, num_kids));
+				t1.start();
+				startRunMovieSit = false;
+			
+			} else {
+				JOptionPane.showMessageDialog(null, "이미 선택된 좌석입니다.");
+				MovieSitPage t1 = new MovieSitPage(user, movieArea,yymmdd);
+				Thread th = new Thread(t1);
+				th.start();
+			}
 
+			dispose();
+		} // 동작 끝
 	}
 
 }

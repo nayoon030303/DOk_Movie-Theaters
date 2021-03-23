@@ -2,6 +2,8 @@ package page;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,7 +28,8 @@ public class LoginPage extends JFrame{
 	private final static int PWLable_Y = 400;
 	private final static int PWTextF_Y = 490;
 	private final static int LoginBtn_Y = 700;
-	
+	Toolkit toolkit = Toolkit.getDefaultToolkit();
+	Image img = toolkit.getImage("src/imges/p_octopus.png");
 	//user
 	private  User user = new User();
 	
@@ -63,6 +66,7 @@ public class LoginPage extends JFrame{
 		super("Login");
 		setSize(600, Main.SCREEN_HEIGHT);
 		setResizable(false);
+		setIconImage(img);
 		//setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setLayout(null);	//레이아웃 null
 		setVisible(true);	
@@ -156,11 +160,10 @@ public class LoginPage extends JFrame{
 				
 			}else if(e.getSource() == iconSignUp) {//회원가입 버튼
 				new SignUpPage();
-				//dispose();
-				//setVisible(false);
-			}else if(e.getSource() == iconBack) {
 				dispose();
+			}else if(e.getSource() == iconBack) {
 				new DOKPage(user);
+				dispose();
 			}
 			
 		}

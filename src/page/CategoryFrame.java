@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,6 +53,9 @@ public class CategoryFrame extends JFrame {
 	public boolean startRunReservation_start = false;
 	public boolean startRunMovieSit = false;
 	
+	//아이콘
+	Toolkit toolkit = Toolkit.getDefaultToolkit();
+	Image img = toolkit.getImage("src/imges/p_octopus.png");
 	
 	// user정보
 	protected User user = new User();
@@ -68,6 +72,9 @@ public class CategoryFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new windowAdapter());
 
+		setIconImage(img);
+		
+		
 		topPanel.setBackground(Color.WHITE);
 		topPanel.setBounds(0, 0, Main.SCREEN_WIDTH, (int) (Main.SCREEN_HEIGHT * 0.25));
 		topPanel.setLayout(null);

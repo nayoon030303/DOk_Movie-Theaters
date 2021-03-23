@@ -213,11 +213,14 @@ public class MyPage extends CategoryFrame{
 			// TODO Auto-generated method stub
 			if(e.getSource() == btn_modify_Info) {
 				String pw = JOptionPane.showInputDialog(null,"비밀번호를 입력해주세요");
-				if(pw.equals(user.getUserPassword())) {
-					new UserInformationPage(user);
-					dispose();
-				}else {
-					JOptionPane.showMessageDialog(null, "비밀번호가 일치하지 않습니다.");
+				if(pw != null) {
+					if(pw.equals(user.getUserPassword())) {
+						new UserInformationPage(user);
+						dispose();
+					}else {
+						JOptionPane.showMessageDialog(null, "비밀번호가 일치하지 않습니다.");
+					}
+					
 				}
 				
 			}

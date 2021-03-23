@@ -51,6 +51,9 @@ public class DOKPage extends CategoryFrame {
       getContentPane().setLayout(null);//레이아웃 null
       setVisible(true);
       
+
+   
+      
       this.user = user;
       
       //만약 로그인 되어있다면

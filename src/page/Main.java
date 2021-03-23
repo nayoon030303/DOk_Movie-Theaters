@@ -1,5 +1,5 @@
 package page;
-
+	
 import User.User;
 
 public class Main {	
@@ -13,17 +13,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		new LoadingPage(user);
-		//new DOKPage(user);
-		//new  Reservation_start_page(user);
-		//new LoginPage();
-		//new MovieSitPage();
-		//new SignUpPage();
-		//new Reservation_start_page();
-		//new MyPage(user);
-		//new ChartPage(user);
-		//new P_InformationPage(user);
-		//new ChartPage();
-		//new ChangePage();
+		
 		
 	}
 

@@ -631,7 +631,7 @@ public class Reservation_start_page extends CategoryFrame implements ActionListe
 				//System.out.println(movieAreas.get(i).get_key());
 				if (isCheckButton && isNoSchedule == false) {
 					noSchedule.setVisible(false);
-					content[i].setText("<html> " + +movieAreas.get(i).get_key()+"시작시간 :"+movieAreas.get(i).getStartTime() + "<br>제목 : " + movieName
+					content[i].setText("<html> " + "시작시간 :"+movieAreas.get(i).getStartTime() + "<br>제목 : " + movieName
 							+ escape1 + movieAreas.get(i).getHall() + escape2 + "남은 자리 :"
 							+ movieAreas.get(i).getVacantSeat() + "/" + "216</html>");
 					//content[i].setText(movieAreas.get(i).get_key()+"");
